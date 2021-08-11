@@ -41,7 +41,18 @@ This Dapr service is written in Rust. It simply starts a new process for the Was
 make pre-install
 make build ## Will build all the components
 ```
-## 5. Start the web-port service
+## 5. Run
+
+To simplify the deployment, we provide a script to run the services:
+
+```bash
+sudo make run-api-go ## Run the image-api-go
+sudo make run-api-rs ## Run the image-api-rs
+sudo make run-web ## Run the Web port service
+```
+
+For each component, you can also run it individually:
+### Start the web-port service
 
 ```bash
 cd web-port
@@ -54,7 +65,7 @@ sudo dapr run --app-id go-web-port \
          ./web-port
 ```
 
-## 6. Start the image-api-go service
+### Start the image-api-go service
 
 ```bash
 cd image-api-go
@@ -67,7 +78,7 @@ sudo dapr run --app-id image-api-go \
          ./image-api-go
 ```
 
-## 7. Start the image-api-rust service
+### Start the image-api-rust service
 
 ```bash
 cd image-api-rs
@@ -87,10 +98,10 @@ sudo dapr list
 ```
 
 ![](./doc/dapr-list.png)
-## 8. [Online Demo: Dapr-WasmEdge](http://13.93.207.62:8080/static/home.html)
+## 6. [Online Demo: Dapr-WasmEdge](http://13.93.207.62:8080/static/home.html)
 
 ![](./doc/demo.png)
-## 9. Appendix: an introduction to Dapr SDK
+## 7. Appendix: an introduction to Dapr SDK
 
 Dapr provides [SDKs](https://docs.dapr.io/developing-applications/sdks/) for different programming languages. Using the SDKs is the easiest way to run your applications in Dapr.
 
