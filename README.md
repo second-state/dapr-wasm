@@ -1,4 +1,4 @@
-# Dapr-WasmEdge
+## [Live Demo](http://13.93.207.62:8080/static/home.html)
 
 [DAPR](https://dapr.io/) is a portable, event-driven runtime that makes it easy for any developer to build resilient, stateless and stateful applications that run on the cloud and edge and embraces the diversity of languages and developer frameworks. It's a Microsoft-incubated [open-source](https://github.com/dapr/dapr) project.
 
@@ -8,22 +8,27 @@ In this demonstration App, we create two image classification web services, inte
 This project is built to demonstrate how to use Dapr to integrate Web applications in any programming language, and how WasmEdge can be embed in Go and Rust applications.
 
 This project contains mainly three components:
-## 1. The [Web port service](./web-port)
+
+*1. The [Web port service](./web-port)*
+
 It is a simple Go Web application which is exposed as an endpoint of the whole application.
 It will render a static HTML page for the user to upload an image, and receive the image from the user, redirect request to internal image APIs.
 
-## 2. The [Go API](./image-api-go)
-It is a Go API service, which is based on Dapr service. This image api will use `WASI` to call a prebuild wasm file to classify an image.
+*2. The [image service in Golang](./image-api-go)*
 
-## 3. The [Rust API](./image-api-rs)
-Since the Dapr Rust SDK is not ready now, we use `warp` to build this Rust API service. It will call wasm in a command-line style to classify a image.
+This Dapr service is written in Golang. It uses `WASI` to call a prebuild wasm file to classify an image using a Tensorflow model.
+
+*3. The [image service in Rust](./image-api-rs)*
+
+This Dapr service is written in Rust. It simply starts a new process for the WasmEdge VM to run and classify a image.
 
 ## Architecture
 
 ![doc](./doc/dapr-wasmedge.png)
 
-## How to develop and use a Dapr service
-Dapr provides some [SDK](https://docs.dapr.io/developing-applications/sdks/) for different programming languages, it is the easiest way to get Dapr into your application.
+## Develop and use a Dapr service
+
+Dapr provides [SDKs](https://docs.dapr.io/developing-applications/sdks/) for different programming languages. Using the SDKs is the easiest way to run your applications in Dapr.
 
 The SDK contains Client, Service, and Runtime API, and it is easy to use. For example, we use Service SDK in `go-sdk` to create the `image-api-go` service
 
@@ -68,6 +73,7 @@ func daprClientSend(image []byte, w http.ResponseWriter) {
 	fmt.Fprintf(w, "%s", string(resp))
 }
 ```
+
 For any Web Service which don't use Dapr SDK but registered as a Dapr instance, we can still can use `http` or `gRpc` to interact with it. Dapr will start a `sidecar` for each service instance. Essentially, `sidecar` works as a proxy for a service instance. We send request to `sidecar`, then the request is forwarded to the service instance. For example, in `web-port/web_port.go` we send a request to Rust api like this(3502 is the port of Sidecar):
 
 ```go
@@ -84,7 +90,8 @@ client := &http.Client{}
 	fmt.Fprintf(w, "%s", body)
 ```
 
-## How to run a Dapr Service
+## Run a Dapr Service
+
 We use this command to start a Dapr service(refer to the commands in `run_*` scripts):
 
 ```bash
@@ -99,7 +106,7 @@ dapr run --app-id image-api-rs \
 
 Dapr can deployed in [Self-Host mode and in Kubernetes mode](https://docs.dapr.io/operations/hosting/), here we use self-host mode to make this demo simple.
 
-## How to build
+## Build
 
 ```bash
 ## Install Docker, Dapr, Golang, Rust
@@ -111,6 +118,7 @@ make pre-install
 ## Build all the components
 make build
 ```
+
 ## Run all the services
 
 ```bash
