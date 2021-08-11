@@ -8,7 +8,6 @@ image-api/image-api
 *.o
 wasmedge-tensorflow-lite
 wasmedgec-tensorflow
-image-api-go
 nohup.out
 
 image-classification/install_wasmedge.sh
