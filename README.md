@@ -13,16 +13,16 @@ This project is built to demonstrate how to use Dapr to integrate Web applicatio
 
 This project contains mainly three components:
 
-* The [Web port service](./web-port)*
+* The [Web port service](./web-port)
 
 It is a simple Go Web application which is exposed as an endpoint of the whole application.
 It will render a static HTML page for the user to upload an image, and receive the image from the user, redirect request to internal image APIs.
 
-* The [image service in Golang](./image-api-go)*
+* The [image service in Golang](./image-api-go)
 
 This Dapr service is written in Golang. It uses `WASI` to call a prebuild wasm file to classify an image using a Tensorflow model.
 
-* The [image service in Rust](./image-api-rs)*
+* The [image service in Rust](./image-api-rs)
 
 This Dapr service is written in Rust. It simply starts a new process for the WasmEdge VM to run and classify a image.
 
@@ -40,6 +40,10 @@ This Dapr service is written in Rust. It simply starts a new process for the Was
 ```bash
 make pre-install
 make build ## Will build all the components
+
+## If you modify the wasm function project (image-classification),
+## Use the commands in ./image-classification/build.sh to generate new compiled files
+make build-wasm
 ```
 ## 5. Run
 
