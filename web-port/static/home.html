@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Wasm Runtime with DAPR</title>
+    <link rel="icon" href="./favicon.ico">
+    <link rel="stylesheet" href="./style.css">
+    <script type='text/javascript' src='./page.js'></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="main">
+            <h1 class="title">
+                Welcome to <a href="https://github.com/WasmEdge/WasmEdge">WasmEdge!</a>
+            </h1>
+
+            <div class="operating">
+                <div>
+                    <input type="file" id="fileElem" class="visually-hidden" accept="image/jpeg"
+                        onchange="fileSelected(this)" />
+                    <label for="fileElem" class="noselect">Select a photo</label>
+
+                    <label for="run-api" > WASM API:</label>
+                    <select id="run-api">
+                        <option value="go">Go</option>
+                        <option value="rust">Rust</option>
+                    </select>
+
+                    <button id="run" onclick="runWasm()" disabled>Classify with WASM</button>
+                </div>
+                <div class='infer' id='result' hidden="true"></div>
+                <div class='thumb'>
+                    <img id="upload-pic" hidden="true" src="#" alt="uploaded" />
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <a>Powered by DAPR & WasmEdge</a>
+        </footer>
+    </div>
+
+
+</body>
+
+</html>
