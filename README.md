@@ -1,5 +1,7 @@
 ## [Live Demo](http://13.93.207.62:8080/static/home.html)
 
+## 1. Introduction
+
 [DAPR](https://dapr.io/) is a portable, event-driven runtime that makes it easy for any developer to build resilient, stateless and stateful applications that run on the cloud and edge and embraces the diversity of languages and developer frameworks. It's a Microsoft-incubated [open-source](https://github.com/dapr/dapr) project.
 
 [WasmEdge](https://github.com/WasmEdge/WasmEdge) is a open-source, high-performance, extensible, and hardware optimized WebAssembly Virtual Machine for automotive, cloud, AI, and blockchain applications.
@@ -7,26 +9,103 @@
 In this demonstration App, we create two image classification web services, integrated with Dapr.
 This project is built to demonstrate how to use Dapr to integrate Web applications in any programming language, and how WasmEdge can be embed in Go and Rust applications.
 
+## 2. Architecture
+
 This project contains mainly three components:
 
-*1. The [Web port service](./web-port)*
+* The [Web port service](./web-port)
 
 It is a simple Go Web application which is exposed as an endpoint of the whole application.
 It will render a static HTML page for the user to upload an image, and receive the image from the user, redirect request to internal image APIs.
 
-*2. The [image service in Golang](./image-api-go)*
+* The [image service in Golang](./image-api-go)
 
 This Dapr service is written in Golang. It uses `WASI` to call a prebuild wasm file to classify an image using a Tensorflow model.
 
-*3. The [image service in Rust](./image-api-rs)*
+* The [image service in Rust](./image-api-rs)
 
 This Dapr service is written in Rust. It simply starts a new process for the WasmEdge VM to run and classify a image.
 
-## Architecture
-
 ![doc](./doc/dapr-wasmedge.png)
 
-## Develop and use a Dapr service
+## 3. Prerequisites
+
+* [Install Golang](https://golang.org/doc/install)
+* [install Rust](https://www.rust-lang.org/en-US/install.html)
+* [Install Dapr](https://dapr.io/docs/install)
+* [Install WasmEdge](./image-classification/install.sh)
+
+## 4. Build
+
+```bash
+make pre-install
+make build ## Will build all the components
+
+## If you modify the wasm function project (image-classification),
+## Use the commands in ./image-classification/build.sh to generate new compiled files
+make build-wasm
+```
+## 5. Run
+
+To simplify the deployment, we provide a script to run the services:
+
+```bash
+sudo make run-api-go ## Run the image-api-go
+sudo make run-api-rs ## Run the image-api-rs
+sudo make run-web ## Run the Web port service
+```
+
+For each component, you can also run it individually:
+### Start the web-port service
+
+```bash
+cd web-port
+sudo dapr run --app-id go-web-port \
+         --app-protocol http \
+         --app-port 8080 \
+         --dapr-http-port 3500 \
+         --components-path ../config \
+         --log-level debug \
+         ./web-port
+```
+
+### Start the image-api-go service
+
+```bash
+cd image-api-go
+sudo dapr run --app-id image-api-go \
+         --app-protocol http \
+         --app-port 9003 \
+         --dapr-http-port 3501 \
+         --log-level debug \
+         --components-path ../config \
+         ./image-api-go
+```
+
+### Start the image-api-rust service
+
+```bash
+cd image-api-rs
+dapr run --app-id image-api-rs \
+         --app-protocol http \
+         --app-port 9004 \
+         --dapr-http-port 3502 \
+         --components-path ../config \
+         --log-level debug \
+         ./target/debug/image-api-rs
+```
+
+After all the services started, we can use this command to verify:
+
+```bash
+sudo dapr list
+```
+
+![](./doc/dapr-list.png)
+## 6. [Online Demo: Dapr-WasmEdge](http://13.93.207.62:8080/static/home.html)
+
+![](./doc/demo.png)
+## 7. Appendix: an introduction to Dapr SDK
 
 Dapr provides [SDKs](https://docs.dapr.io/developing-applications/sdks/) for different programming languages. Using the SDKs is the easiest way to run your applications in Dapr.
 
@@ -89,58 +168,3 @@ client := &http.Client{}
 	body, _ := ioutil.ReadAll(resp.Body)
 	fmt.Fprintf(w, "%s", body)
 ```
-
-## Run a Dapr Service
-
-We use this command to start a Dapr service(refer to the commands in `run_*` scripts):
-
-```bash
-dapr run --app-id image-api-rs \
-         --app-protocol http \
-         --app-port 9004 \
-         --dapr-http-port 3502 \
-         --components-path ../config \
-         --log-level debug \
-         ./target/debug/image-api-rs
-```
-
-Dapr can deployed in [Self-Host mode and in Kubernetes mode](https://docs.dapr.io/operations/hosting/), here we use self-host mode to make this demo simple.
-
-## Build
-
-```bash
-## Install Docker, Dapr, Golang, Rust
-
-## Then install all the dependencies
-sudo dapr init
-make pre-install
-
-## Build all the components
-make build
-```
-
-## Run all the services
-
-```bash
-## Run the image-api-go
-sudo make run-api-go
-
-## Run the image-api-rs
-sudo make run-api-rs
-
-## Run the Web port service
-sudo make run-web
-
-```
-## Verify all the running services
-
-```bash
-sudo dapr list
-```
-
-![](./doc/dapr-list.png)
-
-
-## [Online Demo: Dapr-WasmEdge](http://13.93.207.62:8080/static/home.html)
-
-![](./doc/demo.png)
