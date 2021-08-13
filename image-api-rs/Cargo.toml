@@ -18,3 +18,4 @@ warp = "0.3"
 tokio = { version = "1.0", features = ["rt-multi-thread", "macros"] }
 tokio-stream = { version = "0.1" }
 pretty_env_logger = "0.4"
+wedge = { path = "../../WasmEdge/wasmedge-rs" }
