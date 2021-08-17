@@ -1,5 +1,6 @@
 rustwasmc  build --enable-ext
 cp ./pkg/classify_lib_bg.wasm ../image-api-go/lib
+cp ./pkg/classify_lib_bg.wasm ../image-api-rs/lib
 
 cargo build --target wasm32-wasi
 
