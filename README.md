@@ -32,7 +32,7 @@ This Dapr service is written in Rust. It simply starts a new process for the Was
 
 * [Install Golang](https://golang.org/doc/install)
 * [install Rust](https://www.rust-lang.org/en-US/install.html)
-* [Install Dapr](https://dapr.io/docs/install)
+* [Install Dapr](https://docs.dapr.io/getting-started/)
 * [Install WasmEdge](./image-classification/install.sh)
 
 ## 4. Build
