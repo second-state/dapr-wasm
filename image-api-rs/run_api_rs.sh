@@ -4,4 +4,4 @@ dapr run --app-id image-api-rs \
          --dapr-http-port 3502 \
          --components-path ../config \
          --log-level debug \
-         ./target/debug/image-api-rs
+         ./target/release/image-api-rs

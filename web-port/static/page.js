@@ -21,11 +21,23 @@ function fileSelected(e) {
         var elem = document.getElementById("upload-pic");
         elem.src = e.target.result;
         elem.hidden = false;
+        var origin_img = document.getElementById("origin-pic");
+        origin_img.src = elem.src;
         var button = document.getElementById("run");
         button.removeAttribute("disabled");
 
     }
     reader.readAsDataURL(file);
+}
+
+function setButton() {
+    var button = document.getElementById("run");
+    if ("go" == getApi()) {
+        button.innerText = "Classify";
+    } else {
+        button.innerText = "Grayscale";
+    }
+    button.disabled = false;
 }
 
 function setLoading(loading) {
@@ -34,8 +46,7 @@ function setLoading(loading) {
         button.disabled = true;
         button.innerText = "Sending ...";
     } else {
-        button.disabled = false;
-        button.innerText = "Classify with WASM";
+        setButton();
     }
 }
 
@@ -43,16 +54,23 @@ function setRes(res) {
     var elem = document.getElementById("result");
     elem.innerHTML = res;
     elem.hidden = false;
-    var img = document.getElementById("processed-pic");
-    img.hidden = true;
+    var row = document.getElementById("grayscale-rows");
+    row.hidden = true;
+    var elem = document.getElementById("infer-rows");
+    elem.hidden = false;
 }
 
 function setImageRes(data) {
-    var elem = document.getElementById("result");
+    var row = document.getElementById("grayscale-rows");
+    row.hidden = false;
+    var elem = document.getElementById("infer-rows");
     elem.hidden = true;
     var img = document.getElementById("processed-pic");
-    img.src = "data:image/png;base64, " + data;    
+    img.src = "data:image/png;base64, " + data;
     img.hidden = false;
+    var origin_img = document.getElementById("origin-pic");
+    origin_img.src = document.getElementById("upload-pic").src;
+    origin_img.hidden = false;
 }
 
 function getApi() {
@@ -65,7 +83,7 @@ function runWasm(e) {
     reader.onload = function (e) {
         setLoading(true);
         var req = new XMLHttpRequest();
-        req.open("POST", '/api/hello', true);        
+        req.open("POST", '/api/hello', true);
         req.setRequestHeader('api', getApi());
         req.onload = function () {
             setLoading(false);
