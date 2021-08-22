@@ -36,9 +36,9 @@ pub async fn run_server(port: u16) {
             let v: Vec<u8> = bytes.iter().map(|&x| x).collect();
             println!("len {}", v.len());
             let res = image_process(&v);
-            println!("result: {:?}", res);
+            println!("result len: {:?}", res.len());
             Response::builder()
-                .header("content-type", "image/png")                
+                .header("content-type", "image/png")
                 .body(res)
         });
 

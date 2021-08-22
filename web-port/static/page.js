@@ -7,8 +7,8 @@ function fileSelected(e) {
         return;
     }
 
-    if (!file.type.startsWith('image/png')) {
-        alert('Please select a png image.');
+    if (!file.type.startsWith('image/')) {
+        alert('Please select a image.');
         return;
     }
 

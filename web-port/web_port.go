@@ -60,7 +60,6 @@ func httpClientSend(image []byte, w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "image/png")
 	res := b64.StdEncoding.EncodeToString([]byte(body))
 	//fmt.Print(string(body))
-	//println("body: {}", res)
 	fmt.Fprintf(w, "%s", res)
 }
 
