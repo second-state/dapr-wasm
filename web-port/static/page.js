@@ -7,8 +7,8 @@ function fileSelected(e) {
         return;
     }
 
-    if (!file.type.startsWith('image/jpeg')) {
-        alert('Please select a jpeg image.');
+    if (!file.type.startsWith('image/png')) {
+        alert('Please select a png image.');
         return;
     }
 
@@ -43,6 +43,16 @@ function setRes(res) {
     var elem = document.getElementById("result");
     elem.innerHTML = res;
     elem.hidden = false;
+    var img = document.getElementById("processed-pic");
+    img.hidden = true;
+}
+
+function setImageRes(data) {
+    var elem = document.getElementById("result");
+    elem.hidden = true;
+    var img = document.getElementById("processed-pic");
+    img.src = "data:image/png;base64, " + data;    
+    img.hidden = false;
 }
 
 function getApi() {
@@ -55,12 +65,18 @@ function runWasm(e) {
     reader.onload = function (e) {
         setLoading(true);
         var req = new XMLHttpRequest();
-        req.open("POST", '/api/hello', true);
+        req.open("POST", '/api/hello', true);        
         req.setRequestHeader('api', getApi());
         req.onload = function () {
             setLoading(false);
             if (req.status == 200) {
-                setRes(req.response);
+                var header = req.getResponseHeader("Content-Type");
+                console.log(header);
+                if (header == "image/png") {
+                    setImageRes(req.response);
+                } else {
+                    setRes(req.response);
+                }
             } else {
                 setRes("API error with status: " + req.status);
             }

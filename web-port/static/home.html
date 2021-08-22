@@ -19,7 +19,7 @@
 
             <div class="operating">
                 <div>
-                    <input type="file" id="fileElem" class="visually-hidden" accept="image/jpeg"
+                    <input type="file" id="fileElem" class="visually-hidden" accept="image/*"
                         onchange="fileSelected(this)" />
                     <label for="fileElem" class="noselect">Select a photo</label>
 
@@ -34,6 +34,10 @@
                 <div class='infer' id='result' hidden="true"></div>
                 <div class='thumb'>
                     <img id="upload-pic" hidden="true" src="#" alt="uploaded" />
+                </div>
+
+                <div class='thumb'>
+                    <img id="processed-pic" hidden="true" src="#" />
                 </div>
             </div>
         </div>

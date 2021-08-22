@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+	b64 "encoding/base64"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -55,7 +56,12 @@ func httpClientSend(image []byte, w http.ResponseWriter) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Fprintf(w, "%s", body)
+
+	w.Header().Set("Content-Type", "image/png")
+	res := b64.StdEncoding.EncodeToString([]byte(body))
+	//fmt.Print(string(body))
+	//println("body: {}", res)
+	fmt.Fprintf(w, "%s", res)
 }
 
 func imageHandler(w http.ResponseWriter, r *http.Request) {

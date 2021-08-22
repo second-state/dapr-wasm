@@ -6,7 +6,7 @@
 
 [WasmEdge](https://github.com/WasmEdge/WasmEdge) is a open-source, high-performance, extensible, and hardware optimized WebAssembly Virtual Machine for automotive, cloud, AI, and blockchain applications.
 
-In this demonstration App, we create two image classification web services, integrated with Dapr.
+In this demonstration App, we create two image wasm-rs web services, integrated with Dapr.
 This project is built to demonstrate how to use Dapr to integrate Web applications in any programming language, and how WasmEdge can be embed in Go and Rust applications.
 
 ## 2. Architecture
@@ -24,7 +24,7 @@ This Dapr service is written in Golang. It uses `WASI` to call a prebuild wasm f
 
 * The [image service in Rust](./image-api-rs)
 
-This Dapr service is written in Rust. It simply starts a new process for the WasmEdge VM to run and classify a image.
+This Dapr service is written in Rust. It simply starts a new process for the WasmEdge VM to run and perform grayscale on a image.
 
 ![doc](./doc/dapr-wasmedge.png)
 
@@ -33,7 +33,7 @@ This Dapr service is written in Rust. It simply starts a new process for the Was
 * [Install Golang](https://golang.org/doc/install)
 * [install Rust](https://www.rust-lang.org/en-US/install.html)
 * [Install Dapr](https://dapr.io/docs/install)
-* [Install WasmEdge](./image-classification/install.sh)
+* [Install WasmEdge](./image-wasm-rs/install.sh)
 
 ## 4. Build
 
@@ -41,8 +41,8 @@ This Dapr service is written in Rust. It simply starts a new process for the Was
 make pre-install
 make build ## Will build all the components
 
-## If you modify the wasm function project (image-classification),
-## Use the commands in ./image-classification/build.sh to generate new compiled files
+## If you modify the wasm function project (image-wasm-rs),
+## Use the commands in ./image-wasm-rs/build.sh to generate new compiled files
 make build-wasm
 ```
 ## 5. Run
