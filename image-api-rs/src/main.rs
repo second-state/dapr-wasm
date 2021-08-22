@@ -2,11 +2,11 @@ use std::env;
 use std::io::Write;
 use std::net::Ipv4Addr;
 use std::process::{Command, Stdio};
-use warp::Filter;
+use warp::{http::Response, Filter};
 
-pub fn image_process(buf: &Vec<u8>) -> String {
+pub fn image_process(buf: &Vec<u8>) -> Vec<u8> {
     let mut child = Command::new("./lib/wasmedge-tensorflow-lite")
-        .arg("./lib/classify.so")
+        .arg("./lib/grayscale.so")
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()
@@ -17,8 +17,7 @@ pub fn image_process(buf: &Vec<u8>) -> String {
         stdin.write_all(buf).expect("failed to write to stdin");
     }
     let output = child.wait_with_output().expect("failed to wait on child");
-    let ans = String::from_utf8_lossy(&output.stdout);
-    ans.to_string()
+    output.stdout
 }
 
 #[tokio::main]
@@ -37,8 +36,10 @@ pub async fn run_server(port: u16) {
             let v: Vec<u8> = bytes.iter().map(|&x| x).collect();
             println!("len {}", v.len());
             let res = image_process(&v);
-            println!("result: {}", res);
-            Ok(Box::new(res))
+            println!("result len: {:?}", res.len());
+            Response::builder()
+                .header("content-type", "image/png")
+                .body(res)
         });
 
     let routes = home.or(image);

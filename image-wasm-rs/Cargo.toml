@@ -1,5 +1,5 @@
 [package]
-name = "wasm_vercel_example"
+name = "dapr_wasm"
 version = "0.1.0"
 authors = ["ubuntu"]
 edition = "2018"
@@ -10,7 +10,7 @@ path = "src/lib.rs"
 crate-type = ["cdylib"]
 
 [[bin]]
-name = "classify_bin"
+name = "grayscale_bin"
 path = "src/main.rs"
 
 [dependencies]
