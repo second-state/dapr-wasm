@@ -38,8 +38,7 @@ pub async fn run_server(port: u16) {
             let res = image_process(&v);
             println!("result: {:?}", res);
             Response::builder()
-                .header("content-type", "image/png")
-                .header("hello", "world")
+                .header("content-type", "image/png")                
                 .body(res)
         });
 
