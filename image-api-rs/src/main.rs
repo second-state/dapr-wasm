@@ -6,7 +6,7 @@ use warp::{http::Response, Filter};
 
 pub fn image_process(buf: &Vec<u8>) -> Vec<u8> {
     let mut child = Command::new("./lib/wasmedge-tensorflow-lite")
-        .arg("./lib/grayscale.so")
+        .arg("./lib/grayscale.wasm")
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()

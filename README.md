@@ -39,11 +39,11 @@ This Dapr service is written in Rust. It simply starts a new process for the Was
 ## 4. Build
 
 ```bash
-make pre-install
-make build ## Will build all the components
+make pre-install  ## Install WasmEdge dependences
+make build        ## Will build all the components
 
-## If you modify the wasm function project (image-wasm-rs),
-## Use the commands in ./image-wasm-rs/build.sh to generate new compiled files
+## If you modify the wasm functions project,
+## Use the commands in ./functions/grayscale/build.sh and ./functions/classify/build.sh to generate new compiled files
 make build-wasm
 ```
 ## 5. Run

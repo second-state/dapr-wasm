@@ -131,16 +131,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ef8ae57c4978a2acd8b869ce6b9ca1dfe817bff704c220209fdef2c0b75a01b9"
 
 [[package]]
-name = "dapr_wasm"
-version = "0.1.0"
-dependencies = [
- "image",
- "imageproc",
- "wasm-bindgen",
- "wasmedge_tensorflow_interface",
-]
-
-[[package]]
 name = "deflate"
 version = "0.8.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -175,6 +165,15 @@ checksum = "5a668f699973d0f573d15749b7002a9ac9e1f9c6b220e7b165601334c173d8de"
 dependencies = [
  "color_quant",
  "weezl",
+]
+
+[[package]]
+name = "grayscale"
+version = "0.1.0"
+dependencies = [
+ "image",
+ "imageproc",
+ "wasm-bindgen",
 ]
 
 [[package]]
@@ -614,12 +613,6 @@ name = "wasm-bindgen-shared"
 version = "0.2.61"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "71f77b681efd0bca6f8ea356cdc2e497538b41d3e2a02afed18ce8f022231d29"
-
-[[package]]
-name = "wasmedge_tensorflow_interface"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "53a95373340532901481ea673809aa760f38fdac81cdbb847490949297edd9cc"
 
 [[package]]
 name = "weezl"
