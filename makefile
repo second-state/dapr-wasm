@@ -13,7 +13,7 @@ run-api-go:
 	cd image-api-go && ./run_api_go.sh
 
 build-api-rs:
-	cd image-api-rs && cargo build 
+	cd image-api-rs && cargo build --release
 run-api-rs:
 	cd image-api-rs && ./run_api_rs.sh
 
