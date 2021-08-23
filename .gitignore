@@ -11,7 +11,5 @@ wasmedge-tensorflow-lite
 wasmedgec-tensorflow
 nohup.out
 
-image-wasm-rs/install_wasmedge.sh
-image-wasm-rs/install_wasmedge_image.sh
-image-wasm-rs/install_wasmedge_tensorflow.sh
-image-wasm-rs/install_wasmedge_tensorflow_deps.sh
+install_wasmedge*
+

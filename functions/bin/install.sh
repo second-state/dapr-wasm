@@ -26,13 +26,10 @@ if [ ! -f "$FILE" ]; then
     rm WasmEdge-tensorflow-deps-TFLite-0.8.0-manylinux2014_x86_64.tar.gz
 fi
 
-rustup target add wasm32-wasi
-rustup override set 1.50.0
+cp wasmedge-tensorflow-lite ../../image-api-rs/lib
+cp libtensorflowlite_c.so ../../image-api-rs/lib
 
-cp wasmedge-tensorflow-lite ../image-api-rs/lib
-cp libtensorflowlite_c.so ../image-api-rs/lib
-
-cp wasmedge-tensorflow-lite ../image-api-go/lib
-cp libtensorflowlite_c.so ../image-api-go/lib
+cp wasmedge-tensorflow-lite ../../image-api-go/lib
+cp libtensorflowlite_c.so ../../image-api-go/lib
 
 

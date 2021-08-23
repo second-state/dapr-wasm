@@ -1,10 +1,11 @@
 
 pre-install:
-	cd image-wasm-rs && sudo ./install.sh && ./build.sh
+	cd functions/bin && sudo ./install.sh
 
 build-wasm:
 	rustup target add wasm32-wasi
-	cd image-wasm-rs && ./build.sh
+	cd functions/grayscale && ./build.sh 
+	cd functions/classify && ./build.sh 
 
 build-api-go:
 	cd image-api-go && go build --tags "tensorflow image"
