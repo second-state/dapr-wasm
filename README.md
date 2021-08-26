@@ -1,5 +1,4 @@
-## [Live Demo](http://13.93.207.62:8080/static/home.html)
-
+## [Live Demo](http://23.100.38.125/static/home.html)
 ## 1. Introduction
 
 [DAPR](https://dapr.io/) is a portable, event-driven runtime that makes it easy for any developer to build resilient, stateless and stateful applications that run on the cloud and edge and embraces the diversity of languages and developer frameworks. It's a Microsoft-incubated [open-source](https://github.com/dapr/dapr) project.
@@ -103,7 +102,7 @@ sudo dapr list
 ```
 
 ![](./doc/dapr-list.png)
-## 6. [Online Demo: Dapr-WasmEdge](http://13.93.207.62:8080/static/home.html)
+## 6. [Online Demo: Dapr-WasmEdge](http://23.100.38.125/static/home.html)
 
 ![](./doc/demo.png)
 ## 7. Appendix: an introduction to Dapr SDK

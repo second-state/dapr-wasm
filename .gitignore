@@ -12,4 +12,6 @@ wasmedgec-tensorflow
 nohup.out
 
 install_wasmedge*
+*.log
+restart.sh
 
