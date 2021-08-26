@@ -42,7 +42,8 @@ make pre-install  ## Install WasmEdge dependences
 make build        ## Will build all the components
 
 ## If you modify the wasm functions project,
-## Use the commands in ./functions/grayscale/build.sh and ./functions/classify/build.sh to generate new compiled files
+## Use the commands in ./functions/grayscale/build.sh 
+## and ./functions/classify/build.sh to generate new compiled files
 make build-wasm
 ```
 ## 5. Run
