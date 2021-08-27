@@ -1,5 +1,4 @@
-## [Live Demo](http://13.93.207.62:8080/static/home.html)
-
+## [Live Demo](http://23.100.38.125/static/home.html)
 ## 1. Introduction
 
 [DAPR](https://dapr.io/) is a portable, event-driven runtime that makes it easy for any developer to build resilient, stateless and stateful applications that run on the cloud and edge and embraces the diversity of languages and developer frameworks. It's a Microsoft-incubated [open-source](https://github.com/dapr/dapr) project.
@@ -43,7 +42,8 @@ make pre-install  ## Install WasmEdge dependences
 make build        ## Will build all the components
 
 ## If you modify the wasm functions project,
-## Use the commands in ./functions/grayscale/build.sh and ./functions/classify/build.sh to generate new compiled files
+## Use the commands in ./functions/grayscale/build.sh 
+## and ./functions/classify/build.sh to generate new compiled files
 make build-wasm
 ```
 ## 5. Run
@@ -51,9 +51,9 @@ make build-wasm
 To simplify the deployment, we provide a script to run the services:
 
 ```bash
-sudo make run-api-go ## Run the image-api-go
-sudo make run-api-rs ## Run the image-api-rs
-sudo make run-web ## Run the Web port service
+make run-api-go ## Run the image-api-go
+make run-api-rs ## Run the image-api-rs
+make run-web ## Run the Web port service
 ```
 
 For each component, you can also run it individually:
@@ -61,7 +61,7 @@ For each component, you can also run it individually:
 
 ```bash
 cd web-port
-sudo dapr run --app-id go-web-port \
+dapr run --app-id go-web-port \
          --app-protocol http \
          --app-port 8080 \
          --dapr-http-port 3500 \
@@ -74,7 +74,7 @@ sudo dapr run --app-id go-web-port \
 
 ```bash
 cd image-api-go
-sudo dapr run --app-id image-api-go \
+dapr run --app-id image-api-go \
          --app-protocol http \
          --app-port 9003 \
          --dapr-http-port 3501 \
@@ -99,11 +99,15 @@ dapr run --app-id image-api-rs \
 After all the services started, we can use this command to verify:
 
 ```bash
-sudo dapr list
+dapr list
 ```
-
-![](./doc/dapr-list.png)
-## 6. [Online Demo: Dapr-WasmEdge](http://13.93.207.62:8080/static/home.html)
+```
+  APP ID        HTTP PORT  GRPC PORT  APP PORT  COMMAND               AGE  CREATED              PID
+  go-web-port   3500       44483      8080      ./web-port            15m  2021-08-26 12:19.59  270961
+  image-api-rs  3502       41661      9004      ./target/release/...  9m   2021-08-26 12:25.27  285749
+  image-api-go  3501       34291      9003      ./image-api-go        9m   2021-08-26 12:25.27  285852
+```
+## 6. [Online Demo: Dapr-WasmEdge](http://23.100.38.125/static/home.html)
 
 ![](./doc/demo.png)
 ## 7. Appendix: an introduction to Dapr SDK
