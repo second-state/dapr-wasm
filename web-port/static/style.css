@@ -20,7 +20,9 @@ a {
     padding: 8px;
 }
 
+
 /* Clearfix (clear floats) */
+
 .row::after {
     content: "";
     clear: both;
@@ -96,7 +98,6 @@ a {
 }
 
 input.visually-hidden+label {
-    font-size: 1.5rem;
     background-color: #0070f3;
     border-radius: 5px;
     color: white;
@@ -130,14 +131,13 @@ input.visually-hidden:focus-within+label {
 }
 
 .operating button {
-    font-size: 1.5rem;
     background-color: #0070f3;
     border-radius: 5px;
     color: white;
     padding: 5px 10px;
-    margin-left: 10px;
     cursor: pointer;
     border: 0;
+    font-size: 0.9em;
 }
 
 .operating button:hover {
@@ -179,7 +179,6 @@ input.visually-hidden:focus-within+label {
 
 .infer {
     margin: 1rem 0;
-    font-size: 1.2rem;
 }
 
 .infer a {

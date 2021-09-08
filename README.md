@@ -5,7 +5,7 @@
 
 [WasmEdge](https://github.com/WasmEdge/WasmEdge) is a open-source, high-performance, extensible, and hardware optimized WebAssembly Virtual Machine for automotive, cloud, AI, and blockchain applications.
 
-In this demonstration App, we create two image wasm-rs web services, integrated with Dapr.
+In this demonstration App, we create two image processing web services, integrated with Dapr.
 This project is built to demonstrate how to use Dapr to integrate Web applications in any programming language, and how WasmEdge can be embed in Go and Rust applications.
 
 ## 2. Architecture

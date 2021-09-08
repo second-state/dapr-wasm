@@ -6,6 +6,7 @@ image-api-go/image-api-go
 *.wasm
 *.so
 *.o
+*.log
 restart.sh
 wasmedge-tensorflow-lite
 wasmedgec-tensorflow
