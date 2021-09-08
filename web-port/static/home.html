@@ -3,7 +3,7 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta name="viewport" content="width=device-width">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wasm Runtime with DAPR</title>
     <link rel="icon" href="./favicon.ico">
     <link rel="stylesheet" href="./style.css">
@@ -18,26 +18,22 @@
             </h1>
 
             <div class="operating" style="max-width:90%">
-                <div class="row" style="min-width: 600px;">
-                        <input type="file" id="fileElem" class="visually-hidden" accept="image/*"
-                            onchange="fileSelected(this)" />
-                        <label for="fileElem" class="noselect">Select a photo</label>
+                <div class="row">
+                    <input type="file" id="fileElem" class="visually-hidden" accept="image/*" onchange="fileSelected(this)" />
+                    <label for="fileElem" class="noselect">Select a photo</label>
 
-                        <label for="run-api" style="font-size: 1.0rem;margin-left:20px;">WASM API:</label>
-                        <select id="run-api" onchange="setButton()" style="margin-right:20px">
+                    <label for="run-api" style="margin-left:10px">API:</label>
+                    <select id="run-api" onchange="setButton()" style="margin-right:10px">
                             <option value="go">Go</option>
                             <option value="rust">Rust</option>
                         </select>
-
-                        <button id="run" onclick="runWasm()" disabled>Classify</button>
-
+                    <button id="run" onclick="runWasm()" disabled>Classify</button>
                 </div>
                 <div id="infer-rows" style="margin-top: 30px">
                     <div class='infer' id='result' hidden="true"></div>
-                    <img id="upload-pic" hidden="true" src="#" alt="uploaded"style="max-width:500px; max-height:500px;"/>
+                    <img id="upload-pic" hidden="true" src="#" alt="uploaded" style="max-width:500px; max-height:500px;" />
                 </div>
-                <div class="row" hidden="true" id="grayscale-rows"
-                    style="min-width:600px; margin-top: 30px; margin-left: 20%; margin-right: 20%;align-content: center;">
+                <div class="row" hidden="true" id="grayscale-rows" style="margin-top: 30px; margin-left: 20%; margin-right: 20%;align-content: center;">
                     <div class='column'>
                         <img id="origin-pic" hidden="true" src="#" alt="uploaded" style="width:100%" />
                     </div>
