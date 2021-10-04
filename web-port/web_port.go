@@ -8,8 +8,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"path/filepath"
-	"strings"
 
 	dapr "github.com/dapr/go-sdk/client"
 )
@@ -79,29 +77,6 @@ func imageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func staticHandler(w http.ResponseWriter, r *http.Request) {
-	title, _ := filepath.EvalSymlinks("." + r.URL.Path)
-	types := map[string]string{
-		".html": "text/html",
-		".css":  "text/css",
-		".js":   "application/javascript",
-		".ico":  "image/vnd.microsoft.icon",
-	}
-	content, _ := loadFile(title)
-	w.Header().Set("Content-Type", "text/html")
-	for key, typ := range types {
-		if strings.HasSuffix(title, key) {
-			w.Header().Set("Content-Type", typ)
-			break
-		}
-	}
-	if content == nil {
-		w.WriteHeader(http.StatusNotFound)
-	} else {
-		fmt.Fprintf(w, "%s", content)
-	}
-}
-
 func loadFile(path string) ([]byte, error) {
 	println("loading page: {}", path)
 	body, err := ioutil.ReadFile(path)
@@ -112,7 +87,8 @@ func loadFile(path string) ([]byte, error) {
 }
 
 func main() {
-	http.HandleFunc("/static/", staticHandler)
+	fs := http.FileServer(http.Dir("./static"))
+	http.Handle("/static/", http.StripPrefix("/static/", fs))
 	http.HandleFunc("/api/hello", imageHandler)
 	println("listen to 8080 ...")
 	log.Fatal(http.ListenAndServe(":8080", nil))
