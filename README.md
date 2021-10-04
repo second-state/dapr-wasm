@@ -1,4 +1,7 @@
-## [Live Demo](http://23.100.38.125/static/home.html)
+## Demo and tutorials
+
+[Live Demo](http://23.100.38.125/static/home.html) | [Tutorial article](https://www.infoq.com/articles/webassembly-dapr-wasmedge/) | [Tutorial video](https://youtu.be/A5EhO7cNTCw)
+
 ## 1. Introduction
 
 [DAPR](https://dapr.io/) is a portable, event-driven runtime that makes it easy for any developer to build resilient, stateless and stateful applications that run on the cloud and edge and embraces the diversity of languages and developer frameworks. It's a Microsoft-incubated [open-source](https://github.com/dapr/dapr) project.
@@ -101,75 +104,17 @@ After all the services started, we can use this command to verify:
 ```bash
 dapr list
 ```
+
 ```
   APP ID        HTTP PORT  GRPC PORT  APP PORT  COMMAND               AGE  CREATED              PID
   go-web-port   3500       44483      8080      ./web-port            15m  2021-08-26 12:19.59  270961
   image-api-rs  3502       41661      9004      ./target/release/...  9m   2021-08-26 12:25.27  285749
   image-api-go  3501       34291      9003      ./image-api-go        9m   2021-08-26 12:25.27  285852
 ```
-## 6. [Online Demo: Dapr-WasmEdge](http://23.100.38.125/static/home.html)
+
+## 6. Online Demo: Dapr-WasmEdge
+
+[Access the demo here](http://23.100.38.125/static/home.html)
 
 ![](./doc/demo.png)
-## 7. Appendix: an introduction to Dapr SDK
 
-Dapr provides [SDKs](https://docs.dapr.io/developing-applications/sdks/) for different programming languages. Using the SDKs is the easiest way to run your applications in Dapr.
-
-The SDK contains Client, Service, and Runtime API, and it is easy to use. For example, we use Service SDK in `go-sdk` to create the `image-api-go` service
-
-```go
-func main() {
-	s := daprd.NewService(":9003")
-
-	if err := s.AddServiceInvocationHandler("/api/image", imageHandlerWASI); err != nil {
-		log.Fatalf("error adding invocation handler: %v", err)
-	}
-
-	if err := s.Start(); err != nil && err != http.ErrServerClosed {
-		log.Fatalf("error listenning: %v", err)
-	}
-}
-```
-
-In `web-port/web_port.go`, we use Dapr's Client to send request to Service:
-
-```go
-func daprClientSend(image []byte, w http.ResponseWriter) {
-	ctx := context.Background()
-
-	// create the client
-	client, err := dapr.NewClient()
-	if err != nil {
-		panic(err)
-	}
-
-	content := &dapr.DataContent{
-		ContentType: "text/plain",
-		Data:        image,
-	}
-
-	resp, err := client.InvokeMethodWithContent(ctx, "image-api-go", "/api/image", "post", content)
-	if err != nil {
-		panic(err)
-	}
-	log.Printf("dapr-wasmedge-go method api/image has invoked, response: %s", string(resp))
-	fmt.Printf("Image classify result: %q\n", resp)
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "%s", string(resp))
-}
-```
-
-For any Web Service which don't use Dapr SDK but registered as a Dapr instance, we can still can use `http` or `gRpc` to interact with it. Dapr will start a `sidecar` for each service instance. Essentially, `sidecar` works as a proxy for a service instance. We send request to `sidecar`, then the request is forwarded to the service instance. For example, in `web-port/web_port.go` we send a request to Rust api like this(3502 is the port of Sidecar):
-
-```go
-client := &http.Client{}
-	// http://localhost:<daprPort>/v1.0/invoke/<appId>/method/<method-name>
-	req, err := http.NewRequest("POST", "http://localhost:3502/v1.0/invoke/image-api-rs/method/api/image", bytes.NewBuffer(image))
-	if err != nil {
-		panic(err)
-	}
-	req.Header.Set("Content-Type", "text/plain")
-	resp, _ := client.Do(req)
-	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
-	fmt.Fprintf(w, "%s", body)
-```
