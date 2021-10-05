@@ -33,6 +33,7 @@ This Dapr service is written in Rust. It simply starts a new process for the Was
 ## 3. Prerequisites
 
 * [Install Golang](https://golang.org/doc/install)
+**Note** Package managers like apt will only install older versions of go i.e. go `1.13.8`, so please use link above to install go version `1.17.1` or higher.
 * [install Rust](https://www.rust-lang.org/en-US/install.html)
 * [Install Dapr](https://docs.dapr.io/getting-started/)
 * [Install WasmEdge](https://github.com/WasmEdge/WasmEdge/blob/master/docs/install.md)
