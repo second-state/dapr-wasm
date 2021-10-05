@@ -77,15 +77,6 @@ func imageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func loadFile(path string) ([]byte, error) {
-	println("loading page: {}", path)
-	body, err := ioutil.ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
-	return body, nil
-}
-
 func main() {
 	fs := http.FileServer(http.Dir("./static"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
