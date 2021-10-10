@@ -1,6 +1,6 @@
 ## Demo and tutorials
 
-[Live Demo](http://23.100.38.125/static/home.html) | [Tutorial article](https://www.infoq.com/articles/webassembly-dapr-wasmedge/) | [Tutorial video](https://youtu.be/A5EhO7cNTCw)
+[Live Demo](http://23.100.38.125/static/home.html) | [Tutorial article](https://www.infoq.com/articles/webassembly-dapr-wasmedge/) | [Tutorial video](https://youtu.be/t_sQP6Qpf7U)
 
 ## 1. Introduction
 
