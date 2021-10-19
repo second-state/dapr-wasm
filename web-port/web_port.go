@@ -38,19 +38,22 @@ func daprClientSend(image []byte, w http.ResponseWriter) {
 
 func httpClientSend(image []byte, w http.ResponseWriter) {
 	client := &http.Client{}
-
+	println("httpClientSend ....")
 	// http://localhost:<daprPort>/v1.0/invoke/<appId>/method/<method-name>
-	req, err := http.NewRequest("POST", "http://localhost:3502/v1.0/invoke/image-api-wasi-socket-rs/method/", bytes.NewBuffer(image))
+	req, err := http.NewRequest("POST", "http://localhost:3503/v1.0/invoke/image-api-wasi-socket-rs/method/image", bytes.NewBuffer(image))
 	if err != nil {
 		panic(err)
 	}
+	println(req)
 	req.Header.Set("Content-Type", "text/plain")
 	resp, err := client.Do(req)
 	if err != nil {
 		panic(err)
 	}
+	println(resp)
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
+	println(string(body))
 	if err != nil {
 		panic(err)
 	}

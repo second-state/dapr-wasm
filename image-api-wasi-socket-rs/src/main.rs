@@ -1,17 +1,25 @@
 use bytecodec::DecodeExt;
 use httpcodec::{HttpVersion, ReasonPhrase, Request, RequestDecoder, Response, StatusCode};
 use image::{ImageFormat, ImageOutputFormat};
-use std::io::{Read, Write};
 #[cfg(feature = "std")]
 use std::net::{Shutdown, TcpListener, TcpStream};
+use std::{
+    fmt::format,
+    io::{Read, Write},
+};
 #[cfg(not(feature = "std"))]
 use wasmedge_wasi_socket::{Shutdown, TcpListener, TcpStream};
 
 fn grayscale(image: &[u8]) -> Vec<u8> {
-    let image_format_detected: ImageFormat = image::guess_format(&image).unwrap();
+    let detected = image::guess_format(&image);
+    let mut buf = vec![];
+    if detected.is_err() {
+        return buf;
+    }
+    //println!("process grayscale ...");
+    let image_format_detected = detected.unwrap();
     let img = image::load_from_memory(&image).unwrap();
     let filtered = img.grayscale();
-    let mut buf = vec![];
     match image_format_detected {
         ImageFormat::Gif => {
             filtered.write_to(&mut buf, ImageOutputFormat::Gif).unwrap();
@@ -23,14 +31,15 @@ fn grayscale(image: &[u8]) -> Vec<u8> {
     return buf;
 }
 
-fn handle_http(req: Request<String>) -> bytecodec::Result<Response<String>> {
-    let result = grayscale(req.body().as_bytes());
-    println!("{:?}", result);
+fn handle_http(req: Request<Vec<u8>>) -> bytecodec::Result<Response<String>> {
+    let result = grayscale(req.body());
+    let res = format!("{}=> {:?}", req.body().len(), result.len());
+    //let res = req.body().len();
     Ok(Response::new(
         HttpVersion::V1_0,
         StatusCode::new(200)?,
         ReasonPhrase::new("")?,
-        format!("echo: {}", req.body()),
+        res,
     ))
 }
 
@@ -46,8 +55,9 @@ fn handle_client(mut stream: TcpStream) -> std::io::Result<()> {
         }
     }
 
-    let mut decoder =
-        RequestDecoder::<httpcodec::BodyDecoder<bytecodec::bytes::Utf8Decoder>>::default();
+    let mut decoder = RequestDecoder::<
+        httpcodec::BodyDecoder<bytecodec::bytes::RemainingBytesDecoder>,
+    >::default();
 
     let req = match decoder.decode_from_bytes(data.as_slice()) {
         Ok(req) => handle_http(req),
@@ -59,7 +69,7 @@ fn handle_client(mut stream: TcpStream) -> std::io::Result<()> {
         Err(e) => {
             let err = format!("{:?}", e);
             Response::new(
-                HttpVersion::V1_0,
+                HttpVersion::V1_1,
                 StatusCode::new(500).unwrap(),
                 ReasonPhrase::new(err.as_str()).unwrap(),
                 err.clone(),

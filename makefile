@@ -19,9 +19,9 @@ run-api-rs:
 
 
 build-api-wasi-socket-rs:
-	cd image-api-wasi-socket-rs && cargo build  --target wasm32-wasi --release
+	cd image-api-wasi-socket-rs && cargo build  --target wasm32-wasi
 run-api-rs:
-	cd image-api-wasi-socket-rs && ./run_api_rs.sh	
+	cd image-api-wasi-socket-rs && ./run_api_wasi_socket_rs.sh
 
 build-web:
 	cd web-port; go build
