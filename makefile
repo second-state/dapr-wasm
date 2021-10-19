@@ -1,6 +1,6 @@
 
 pre-install:
-	cd functions/bin && sudo ./install.sh
+	cd functions/bin && ./install.sh
 
 build-wasm:
 	rustup target add wasm32-wasi
@@ -18,7 +18,7 @@ run-api-rs:
 	cd image-api-rs && ./run_api_rs.sh
 
 build-api-wasi-socket-rs:
-	cd image-api-wasi-socket-rs && cargo build  --target wasm32-wasi --release
+	cd image-api-wasi-socket-rs && cargo build  --target wasm32-wasi
 run-api-wasi-socket-rs:
 	cd image-api-wasi-socket-rs && ./run_api_wasi_socket_rs.sh
 
@@ -27,5 +27,5 @@ build-web:
 run-web:
 	cd web-port; ./run_web.sh
 
-build: build-wasm build-api-go build-api-rs build-run_api_wasi_socket_rs build-web
+build: build-wasm build-api-go build-api-rs build-api-wasi-socket-rs build-web
 
