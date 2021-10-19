@@ -40,7 +40,7 @@ func httpClientSend(image []byte, w http.ResponseWriter) {
 	client := &http.Client{}
 
 	// http://localhost:<daprPort>/v1.0/invoke/<appId>/method/<method-name>
-	req, err := http.NewRequest("POST", "http://localhost:3502/v1.0/invoke/image-api-rs/method/api/image", bytes.NewBuffer(image))
+	req, err := http.NewRequest("POST", "http://localhost:3502/v1.0/invoke/image-api-wasi-socket-rs/method/", bytes.NewBuffer(image))
 	if err != nil {
 		panic(err)
 	}
