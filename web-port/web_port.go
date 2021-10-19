@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"context"
-	b64 "encoding/base64"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -36,31 +35,38 @@ func daprClientSend(image []byte, w http.ResponseWriter) {
 	fmt.Fprintf(w, "%s", string(resp))
 }
 
-func httpClientSend(image []byte, w http.ResponseWriter) {
+func httpClientSend(image []byte, w http.ResponseWriter, api string) {
 	client := &http.Client{}
 	println("httpClientSend ....")
-	// http://localhost:<daprPort>/v1.0/invoke/<appId>/method/<method-name>
-	req, err := http.NewRequest("POST", "http://localhost:3503/v1.0/invoke/image-api-wasi-socket-rs/method/image", bytes.NewBuffer(image))
+
+	// Dapr api format: http://localhost:<daprPort>/v1.0/invoke/<appId>/method/<method-name>
+	var uri string
+	if api == "rust" {
+		uri = "http://localhost:3502/v1.0/invoke/image-api-rs/method/api/image"
+	} else {
+		uri = "http://localhost:3503/v1.0/invoke/image-api-wasi-socket-rs/method/image"
+	}
+	println("uri: ", uri)
+	req, err := http.NewRequest("POST", uri, bytes.NewBuffer(image))
+
 	if err != nil {
 		panic(err)
 	}
-	println(req)
-	req.Header.Set("Content-Type", "text/plain")
 	resp, err := client.Do(req)
 	if err != nil {
 		panic(err)
 	}
 	println(resp)
+
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
-	println(string(body))
 	if err != nil {
 		panic(err)
 	}
 
+	println(string(body))
 	w.Header().Set("Content-Type", "image/png")
-	res := b64.StdEncoding.EncodeToString([]byte(body))
-	//fmt.Print(string(body))
+	res := string(body)
 	fmt.Fprintf(w, "%s", res)
 }
 
@@ -76,7 +82,7 @@ func imageHandler(w http.ResponseWriter, r *http.Request) {
 	if api == "go" {
 		daprClientSend(body, w)
 	} else {
-		httpClientSend(body, w)
+		httpClientSend(body, w, api)
 	}
 }
 

@@ -1,12 +1,10 @@
 use bytecodec::DecodeExt;
 use httpcodec::{HttpVersion, ReasonPhrase, Request, RequestDecoder, Response, StatusCode};
 use image::{ImageFormat, ImageOutputFormat};
+
+use std::io::{Read, Write};
 #[cfg(feature = "std")]
 use std::net::{Shutdown, TcpListener, TcpStream};
-use std::{
-    fmt::format,
-    io::{Read, Write},
-};
 #[cfg(not(feature = "std"))]
 use wasmedge_wasi_socket::{Shutdown, TcpListener, TcpStream};
 
@@ -32,8 +30,9 @@ fn grayscale(image: &[u8]) -> Vec<u8> {
 }
 
 fn handle_http(req: Request<Vec<u8>>) -> bytecodec::Result<Response<String>> {
-    let result = grayscale(req.body());
-    let res = format!("{}=> {:?}", req.body().len(), result.len());
+    let image = grayscale(req.body());
+    //let res = format!("{}=> {:?}", req.body().len(), result.len());
+    let res = base64::encode(&image);
     //let res = req.body().len();
     Ok(Response::new(
         HttpVersion::V1_0,
