@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 
 	dapr "github.com/dapr/go-sdk/client"
 )
@@ -64,9 +65,11 @@ func httpClientSend(image []byte, w http.ResponseWriter, api string) {
 		panic(err)
 	}
 
-	println(string(body))
-	w.Header().Set("Content-Type", "image/png")
 	res := string(body)
+	if strings.Contains(res, "Max bytes limit exceeded") {
+		res = "ImageTooLarge"
+	}
+	w.Header().Set("Content-Type", "image/png")
 	fmt.Fprintf(w, "%s", res)
 }
 

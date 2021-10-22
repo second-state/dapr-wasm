@@ -33,7 +33,7 @@ fn grayscale(image: &[u8]) -> Vec<u8> {
 
 fn handle_http(req: Request<Vec<u8>>) -> bytecodec::Result<Response<String>> {
     let image = grayscale(req.body());
-    //let res = format!("{}=> {:?}", req.body().len(), result.len());
+    //let res = format!("{}=> {:?}", req.body().len(), image.len());
     let res = base64::encode(&image);
     //let res = req.body().len();
     Ok(Response::new(
@@ -60,9 +60,10 @@ fn handle_client(mut stream: TcpStream) -> std::io::Result<()> {
 
     // According to https://github.com/sile/httpcodec/blob/master/src/message.rs#L30
     // For processing large image, set this option for enlarging the max_bytes
+    // There is a bug in httpcodec, it will not process large image correctly
     let option = DecodeOptions {
-        max_start_line_size: 0xFFFFFF,
-        max_header_size: 0xFFFFFF,
+        max_start_line_size: 0xFFFF,
+        max_header_size: 0xFFFF,
     };
     let mut decoder = RequestDecoder::<
         httpcodec::BodyDecoder<bytecodec::bytes::RemainingBytesDecoder>,
