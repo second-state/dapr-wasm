@@ -1,5 +1,7 @@
 use bytecodec::DecodeExt;
-use httpcodec::{HttpVersion, ReasonPhrase, Request, RequestDecoder, Response, StatusCode};
+use httpcodec::{
+    DecodeOptions, HttpVersion, ReasonPhrase, Request, RequestDecoder, Response, StatusCode,
+};
 use image::{ImageFormat, ImageOutputFormat};
 
 use std::io::{Read, Write};
@@ -54,9 +56,17 @@ fn handle_client(mut stream: TcpStream) -> std::io::Result<()> {
         }
     }
 
+    let body_decoder = httpcodec::BodyDecoder::<bytecodec::bytes::RemainingBytesDecoder>::default();
+
+    // According to https://github.com/sile/httpcodec/blob/master/src/message.rs#L30
+    // For processing large image, set this option for enlarging the max_bytes
+    let option = DecodeOptions {
+        max_start_line_size: 0xFFFFFF,
+        max_header_size: 0xFFFFFF,
+    };
     let mut decoder = RequestDecoder::<
         httpcodec::BodyDecoder<bytecodec::bytes::RemainingBytesDecoder>,
-    >::default();
+    >::with_options(body_decoder, option);
 
     let req = match decoder.decode_from_bytes(data.as_slice()) {
         Ok(req) => handle_http(req),
