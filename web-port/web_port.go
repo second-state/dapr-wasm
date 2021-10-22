@@ -66,6 +66,7 @@ func httpClientSend(image []byte, w http.ResponseWriter, api string) {
 	}
 
 	res := string(body)
+	println("res: ", res)
 	if strings.Contains(res, "Max bytes limit exceeded") {
 		res = "ImageTooLarge"
 	}
