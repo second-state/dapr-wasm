@@ -1,4 +1,3 @@
-
 var image;
 
 function fileSelected(e) {
@@ -17,7 +16,7 @@ function fileSelected(e) {
     image = img;
 
     const reader = new FileReader();
-    reader.onload = function (e) {
+    reader.onload = function(e) {
         var elem = document.getElementById("upload-pic");
         elem.src = e.target.result;
         elem.hidden = false;
@@ -61,16 +60,20 @@ function setRes(res) {
 }
 
 function setImageRes(data) {
-    var row = document.getElementById("grayscale-rows");
-    row.hidden = false;
-    var elem = document.getElementById("infer-rows");
-    elem.hidden = true;
-    var img = document.getElementById("processed-pic");
-    img.src = "data:image/png;base64, " + data;
-    img.hidden = false;
-    var origin_img = document.getElementById("origin-pic");
-    origin_img.src = document.getElementById("upload-pic").src;
-    origin_img.hidden = false;
+    if (data == "ImageTooLarge") {
+        alert("Image Too Large");
+    } else {
+        var row = document.getElementById("grayscale-rows");
+        row.hidden = false;
+        var elem = document.getElementById("infer-rows");
+        elem.hidden = true;
+        var img = document.getElementById("processed-pic");
+        img.src = "data:image/png;base64, " + data;
+        img.hidden = false;
+        var origin_img = document.getElementById("origin-pic");
+        origin_img.src = document.getElementById("upload-pic").src;
+        origin_img.hidden = false;
+    }
 }
 
 function getApi() {
@@ -80,12 +83,12 @@ function getApi() {
 
 function runWasm(e) {
     const reader = new FileReader();
-    reader.onload = function (e) {
+    reader.onload = function(e) {
         setLoading(true);
         var req = new XMLHttpRequest();
         req.open("POST", '/api/hello', true);
         req.setRequestHeader('api', getApi());
-        req.onload = function () {
+        req.onload = function() {
             setLoading(false);
             if (req.status == 200) {
                 var header = req.getResponseHeader("Content-Type");

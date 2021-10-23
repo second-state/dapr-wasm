@@ -360,6 +360,7 @@ dependencies = [
 name = "image-api-rs"
 version = "0.1.0"
 dependencies = [
+ "base64",
  "bytes",
  "futures-core",
  "futures-util",

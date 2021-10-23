@@ -5,7 +5,7 @@ use std::process::{Command, Stdio};
 use warp::{http::Response, Filter};
 
 pub fn image_process(buf: &Vec<u8>) -> Vec<u8> {
-    let mut child = Command::new("wasmedge-tensorflow-lite")
+    let mut child = Command::new("wasmedge")
         .arg("./lib/grayscale.wasm")
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
@@ -17,6 +17,7 @@ pub fn image_process(buf: &Vec<u8>) -> Vec<u8> {
         stdin.write_all(buf).expect("failed to write to stdin");
     }
     let output = child.wait_with_output().expect("failed to wait on child");
+    println!("len: {:?} => {:?}", buf.len(), output.stdout.len());
     output.stdout
 }
 
@@ -36,10 +37,11 @@ pub async fn run_server(port: u16) {
             let v: Vec<u8> = bytes.iter().map(|&x| x).collect();
             println!("len {}", v.len());
             let res = image_process(&v);
+            let encoded = base64::encode(&res);
             println!("result len: {:?}", res.len());
             Response::builder()
                 .header("content-type", "image/png")
-                .body(res)
+                .body(encoded)
         });
 
     let routes = home.or(image);

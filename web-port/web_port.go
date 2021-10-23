@@ -3,11 +3,11 @@ package main
 import (
 	"bytes"
 	"context"
-	b64 "encoding/base64"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 
 	dapr "github.com/dapr/go-sdk/client"
 )
@@ -36,28 +36,41 @@ func daprClientSend(image []byte, w http.ResponseWriter) {
 	fmt.Fprintf(w, "%s", string(resp))
 }
 
-func httpClientSend(image []byte, w http.ResponseWriter) {
+func httpClientSend(image []byte, w http.ResponseWriter, api string) {
 	client := &http.Client{}
+	println("httpClientSend ....")
 
-	// http://localhost:<daprPort>/v1.0/invoke/<appId>/method/<method-name>
-	req, err := http.NewRequest("POST", "http://localhost:3502/v1.0/invoke/image-api-rs/method/api/image", bytes.NewBuffer(image))
+	// Dapr api format: http://localhost:<daprPort>/v1.0/invoke/<appId>/method/<method-name>
+	var uri string
+	if api == "rust" {
+		uri = "http://localhost:3502/v1.0/invoke/image-api-rs/method/api/image"
+	} else {
+		uri = "http://localhost:3503/v1.0/invoke/image-api-wasi-socket-rs/method/image"
+	}
+	println("uri: ", uri)
+	req, err := http.NewRequest("POST", uri, bytes.NewBuffer(image))
+
 	if err != nil {
 		panic(err)
 	}
-	req.Header.Set("Content-Type", "text/plain")
 	resp, err := client.Do(req)
 	if err != nil {
 		panic(err)
 	}
+	println(resp)
+
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		panic(err)
 	}
 
+	res := string(body)
+	println("res: ", res)
+	if strings.Contains(res, "Max bytes limit exceeded") {
+		res = "ImageTooLarge"
+	}
 	w.Header().Set("Content-Type", "image/png")
-	res := b64.StdEncoding.EncodeToString([]byte(body))
-	//fmt.Print(string(body))
 	fmt.Fprintf(w, "%s", res)
 }
 
@@ -73,7 +86,7 @@ func imageHandler(w http.ResponseWriter, r *http.Request) {
 	if api == "go" {
 		daprClientSend(body, w)
 	} else {
-		httpClientSend(body, w)
+		httpClientSend(body, w, api)
 	}
 }
 
