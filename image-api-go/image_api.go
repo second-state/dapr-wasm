@@ -60,6 +60,10 @@ func imageHandlerWASI(_ context.Context, in *common.InvocationEvent) (out *commo
 	vm.Delete()
 	conf.Delete()
 
+	tfobj.Delete()
+	tfliteobj.Delete()
+	imgobj.Delete()
+
 	fmt.Printf("Image classify result: %q\n", ans)
 	out = &common.Content{
 		Data:        []byte(ans),
