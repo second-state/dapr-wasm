@@ -13,12 +13,16 @@ This project is built to demonstrate how to use Dapr to integrate Web applicatio
 
 ## 2. Architecture
 
-This project contains mainly three components:
+This project contains 4 Dapr sidecar services:
 
 * The [Web port service](./web-port)
 
 It is a simple Go Web application which is exposed as an endpoint of the whole application.
 It will render a static HTML page for the user to upload an image, and receive the image from the user, redirect request to internal image APIs.
+
+* The [image service in WasmEdge](./image-api-wasi-socket-rs)
+
+This Dapr service is written in Rust and compiled to WebAssembly. Running inside WasmEdge Runtime, the WebAssembly bytecode program creates a HTTP service that listens for RPC requests from other Dapr applications, including the [web port](./web-port).
 
 * The [image service in Golang](./image-api-go)
 
@@ -55,12 +59,14 @@ make build-wasm
 To simplify the deployment, we provide a script to run the services:
 
 ```bash
-make run-api-go ## Run the image-api-go
-make run-api-rs ## Run the image-api-rs
+make run-api-wasi-socket-rs ## Run the WasmEdge microservice
+make run-api-go ## Run the image-api-go microservice
+make run-api-rs ## Run the image-api-rs microservice
 make run-web ## Run the Web port service
 ```
 
 For each component, you can also run it individually:
+
 ### Start the web-port service
 
 ```bash
@@ -74,7 +80,18 @@ dapr run --app-id go-web-port \
          ./web-port
 ```
 
-### Start the image-api-go service
+### Start the WasmEdge microservice for image processing
+
+```bash
+cd image-api-wasi-socket-rs
+dapr run --app-id image-api-wasi-socket-rs \
+         --app-protocol http \
+         --app-port 9005 \
+         --dapr-http-port 3503 \
+         --components-path ../config \
+         --log-level debug \
+	 wasmedge ./target/wasm32-wasi/debug/image-api-wasi-socket-rs.wasm
+```
 
 ```bash
 cd image-api-go
@@ -107,10 +124,11 @@ dapr list
 ```
 
 ```
-  APP ID        HTTP PORT  GRPC PORT  APP PORT  COMMAND               AGE  CREATED              PID
-  go-web-port   3500       44483      8080      ./web-port            15m  2021-08-26 12:19.59  270961
-  image-api-rs  3502       41661      9004      ./target/release/...  9m   2021-08-26 12:25.27  285749
-  image-api-go  3501       34291      9003      ./image-api-go        9m   2021-08-26 12:25.27  285852
+  APP ID                     HTTP PORT  GRPC PORT  APP PORT  COMMAND               AGE  CREATED              PID
+  go-web-port                3500       44483      8080      ./web-port            15m  2021-10-23 12:19.59  270961
+  image-api-wasi-socket-rs   3503       41775      9005      wasmedge              9m   2021-10-23 12:25:27  294758
+  image-api-rs               3502       41661      9004      ./target/release/...  9m   2021-10-23 12:25.27  285749
+  image-api-go               3501       34291      9003      ./image-api-go        9m   2021-10-23 12:25.27  285852
 ```
 
 ## 6. Online Demo: Dapr-WasmEdge
