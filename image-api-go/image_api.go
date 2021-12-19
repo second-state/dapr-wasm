@@ -34,8 +34,7 @@ func imageHandlerWASI(_ context.Context, in *common.InvocationEvent) (out *commo
 	wasi.InitWasi(
 		os.Args[1:],     /// The args
 		os.Environ(),    /// The envs
-		[]string{".:."}, /// The mapping directories
-		[]string{},      /// The preopens will be empty
+		[]string{".:."}, /// The preopens will be empty
 	)
 
 	/// Register WasmEdge-tensorflow and WasmEdge-image
@@ -57,12 +56,12 @@ func imageHandlerWASI(_ context.Context, in *common.InvocationEvent) (out *commo
 		println("error: ", err.Error())
 	}
 
-	vm.Delete()
-	conf.Delete()
+	vm.Release()
+	conf.Release()
 
-	tfobj.Delete()
-	tfliteobj.Delete()
-	imgobj.Delete()
+	tfobj.Release()
+	tfliteobj.Release()
+	imgobj.Release()
 
 	fmt.Printf("Image classify result: %q\n", ans)
 	out = &common.Content{
