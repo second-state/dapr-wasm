@@ -5,7 +5,7 @@ authors = ["yukang <moorekang@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-wasmedge_wasi_socket = "0.1.0"
+wasmedge_wasi_socket = "0.2.0"
 httpcodec = "0.2.3"
 base64 = "0.13.0"
 bytecodec = "0.4.15"
