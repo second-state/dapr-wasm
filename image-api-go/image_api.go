@@ -52,8 +52,9 @@ func imageHandlerWASI(_ context.Context, in *common.InvocationEvent) (out *commo
 	/// vm.Instantiate()
 	bg := bindgen.Instantiate(vm)
 
-	res, err := vm.Execute("infer", image)
-	ans := string(res[0].([]byte))
+	res, err := bg.Execute("infer", image)
+	// ans := string(res[0].([]byte))
+	ans := res[0].(string)
 	if err != nil {
 		println("error: ", err.Error())
 	}
