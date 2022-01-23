@@ -1,5 +1,5 @@
-rustup override set 1.50.0
+rustup target add wasm32-wasi
+cargo build --target wasm32-wasi --release
 
-rustwasmc  build --enable-ext
-cp ./pkg/classify_bg.wasm ../../image-api-go/lib/classify_bg.wasm
+cp ./target/wasm32-wasi/release/classify.wasm ../../image-api-go/lib/classify.wasm
 echo -e "finished build functions/classify ..."
