@@ -2,7 +2,7 @@
 name = "classify"
 version = "0.1.0"
 authors = ["WasmEdge"]
-edition = "2018"
+edition = "2021"
 
 [lib]
 name = "classify"
@@ -11,4 +11,5 @@ crate-type = ["cdylib"]
 
 [dependencies]
 wasmedge_tensorflow_interface = "^0.2.0"
-wasm-bindgen = "=0.2.61"
+wasmedge-bindgen = "0.1.13"
+wasmedge-bindgen-macro = "0.1.13"

@@ -6,4 +6,3 @@ wget -q https://raw.githubusercontent.com/dapr/cli/master/install/install.sh -O 
 dapr init
 
 wget -qO- https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | sudo bash -s -- -e all -p /usr/local
-curl https://raw.githubusercontent.com/second-state/rustwasmc/master/installer/init.sh -sSf | sh

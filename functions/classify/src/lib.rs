@@ -1,7 +1,9 @@
-use wasm_bindgen::prelude::*;
+#![allow(unused_imports)]
+use wasmedge_bindgen::*;
+use wasmedge_bindgen_macro::*;
 mod infer;
 
-#[wasm_bindgen]
-pub fn infer(image_data: &[u8]) -> String {
-    infer::infer_internal(image_data)
+#[wasmedge_bindgen]
+pub fn infer(image_data: Vec<u8>) -> String {
+    infer::infer_internal(&image_data)
 }
