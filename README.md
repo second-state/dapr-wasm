@@ -133,7 +133,7 @@ dapr list
 
 ## 6. Online Demo: Dapr-WasmEdge
 
-[Access the demo here](http://23.100.38.125/static/home.html)
+[Access the demo here](http://23.100.38.125:9000/static/home.html)
 
 ![](./doc/demo.png)
 
