@@ -81,6 +81,25 @@ function getApi() {
     return select.options[select.selectedIndex].value;
 }
 
+function updateStat(api) {
+
+
+
+    console.log("update stat...", api);
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/api/invokecount?api=' + api, true);
+    xhr.responseType = 'json';
+    xhr.onload = function() {
+        var status = xhr.status;
+        if (status === 200) {
+            var res = xhr.response;
+            document.getElementById('stat').hidden = false;
+            document.getElementById('stat-text').innerHTML = res.count;
+        }
+    };
+    xhr.send();
+}
+
 function runWasm(e) {
     const reader = new FileReader();
     reader.onload = function(e) {
@@ -98,6 +117,7 @@ function runWasm(e) {
                 } else {
                     setRes(req.response);
                 }
+                updateStat(getApi());
             } else {
                 setRes("API error with status: " + req.status);
             }
