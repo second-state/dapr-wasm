@@ -161,18 +161,13 @@ func statHandler(w http.ResponseWriter, r *http.Request) {
 		println("error: ", err.Error())
 		panic(err)
 	}
-
 	count, _ := daprClient.GetState(ctx, stateStoreName, countKey, nil)
 	curCount, _ := strconv.ParseInt(string(count.Value), 10, 32)
-
-	println("curCount: ", curCount)
-
 	// get the last 10 events
 	res := make(map[string]string)
 	for i := curCount; i > Max(0, curCount-int64(10)); i-- {
 		eventKey := "event-" + strconv.FormatInt(i, 10)
 		eventVal, _ := daprClient.GetState(ctx, stateStoreName, eventKey, nil)
-		println("eventVal: ", string(eventVal.Value))
 		res[eventKey] = string(eventVal.Value)
 	}
 	keys := make([]string, 0, len(res))

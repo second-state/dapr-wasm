@@ -82,10 +82,6 @@ function getApi() {
 }
 
 function updateStat(api) {
-
-
-
-    console.log("update stat...", api);
     var xhr = new XMLHttpRequest();
     xhr.open('GET', '/api/invokecount?api=' + api, true);
     xhr.responseType = 'json';
