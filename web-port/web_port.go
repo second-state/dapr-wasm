@@ -8,8 +8,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"strconv"
 	"strings"
+	"time"
 
 	dapr "github.com/dapr/go-sdk/client"
 )
@@ -18,25 +18,18 @@ const (
 	stateStoreName = `statestore`
 )
 
-func storeCount(api string) {
-
+func storeCount(api string, msg string) {
 	daprClient, err := dapr.NewClient()
 	if err != nil {
 		panic(err)
 	}
+	//defer daprClient.Close()
 	ctx := context.Background()
 
 	var key = "image-api-" + api
-	curStr, state_err := daprClient.GetState(ctx, stateStoreName, key)
-	if state_err != nil {
-		fmt.Printf("Failed to persist state: %v\n", state_err)
-	}
-	curCount, _ := strconv.ParseInt(string(curStr.Value), 10, 32)
-	curCount++
-
-	println("key: ", key)
-	println("curCount: ", curCount)
-	state_err = daprClient.SaveState(ctx, stateStoreName, key, []byte(strconv.Itoa(int(curCount))))
+	fmt.Printf("key: %s", key)
+	fmt.Printf("msg: %s", msg)
+	state_err := daprClient.SaveState(ctx, stateStoreName, key, []byte(msg))
 	if state_err != nil {
 		fmt.Printf("Failed to persist state: %v\n", state_err)
 	} else {
@@ -45,25 +38,26 @@ func storeCount(api string) {
 }
 
 func daprClientSend(image []byte, w http.ResponseWriter, api string) {
-	ctx := context.Background()
-
 	// create the client
 	client, err := dapr.NewClient()
 	if err != nil {
 		panic(err)
 	}
+	//defer client.Close()
+	ctx := context.Background()
 
 	content := &dapr.DataContent{
 		ContentType: "text/plain",
 		Data:        image,
 	}
 
+	image_size := len(image)
 	resp, err := client.InvokeMethodWithContent(ctx, "image-api-go", "/api/image", "post", content)
 	if err != nil {
 		panic(err)
 	}
 
-	storeCount(api)
+	storeCount(api, fmt.Sprintf("image_size: %d", image_size))
 
 	log.Printf("dapr-wasmedge-go method api/image has invoked, response: %s", string(resp))
 	fmt.Printf("Image classify result: %q\n", resp)
@@ -73,7 +67,7 @@ func daprClientSend(image []byte, w http.ResponseWriter, api string) {
 
 func httpClientSend(image []byte, w http.ResponseWriter, api string) {
 	client := &http.Client{}
-	println("httpClientSend ....")
+	fmt.Printf("httpClientSend ....")
 
 	// Dapr api format: http://localhost:<daprPort>/v1.0/invoke/<appId>/method/<method-name>
 	var uri string
@@ -84,7 +78,9 @@ func httpClientSend(image []byte, w http.ResponseWriter, api string) {
 	}
 	println("uri: ", uri)
 
+	start_time := time.Now()
 	req, err := http.NewRequest("POST", uri, bytes.NewBuffer(image))
+
 	if err != nil {
 		panic(err)
 	}
@@ -92,20 +88,28 @@ func httpClientSend(image []byte, w http.ResponseWriter, api string) {
 	if err != nil {
 		panic(err)
 	}
-	storeCount(api)
-	println(resp)
+	end_time := time.Now()
 
-	defer resp.Body.Close()
+	//println(resp)
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		panic(err)
 	}
 
+	old_image_size := float64(len(image)) / 1024
+	process_image_size := float64(len(body)) / 1024
+	cost_time := end_time.Sub(start_time).Seconds()
+	store_msg := fmt.Sprintf("old_size: %.2f (kb), cur_size: %.2f (kb) cost_time: %.3f (s)",
+		old_image_size, process_image_size, cost_time)
+	storeCount(api, store_msg)
+	fmt.Printf("herrrrrrrrr")
+
 	res := string(body)
-	println("res: ", res)
+	//println("res: ", res)
 	if strings.Contains(res, "Max bytes limit exceeded") {
 		res = "ImageTooLarge"
 	}
+	fmt.Printf("finished process !!!!!!!!!!!!")
 	w.Header().Set("Content-Type", "image/png")
 	fmt.Fprintf(w, "%s", res)
 }
@@ -132,6 +136,7 @@ func statHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
+	//defer daprClient.Close()
 	ctx := context.Background()
 
 	if err != nil {
