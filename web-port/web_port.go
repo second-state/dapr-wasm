@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -19,6 +20,7 @@ import (
 
 const (
 	stateStoreName = `statestore`
+	countKey       = `count`
 )
 
 func storeCount(api string, msg string) {
@@ -32,7 +34,16 @@ func storeCount(api string, msg string) {
 	var key = "image-api-" + api
 	fmt.Printf("key: %s", key)
 	fmt.Printf("msg: %s", msg)
-	state_err := daprClient.SaveState(ctx, stateStoreName, key, []byte(msg))
+	count, _ := daprClient.GetState(ctx, stateStoreName, countKey, nil)
+	curCount, _ := strconv.ParseInt(string(count.Value), 10, 32)
+	curCount++
+
+	state_err := daprClient.SaveState(ctx, stateStoreName, countKey, []byte(strconv.FormatInt(curCount, 10)), nil)
+
+	eventKey := "event-" + strconv.FormatInt(curCount, 10)
+	timestamp := time.Now().Format("2006-01-02 15:04:05")
+	eventVal := fmt.Sprintf("%s,%s,%s", timestamp, key, msg)
+	state_err = daprClient.SaveState(ctx, stateStoreName, eventKey, []byte(eventVal), nil)
 	if state_err != nil {
 		fmt.Printf("Failed to persist state: %v\n", state_err)
 	} else {
@@ -130,6 +141,13 @@ func imageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func Max(x, y int64) int64 {
+	if x < y {
+		return y
+	}
+	return x
+}
+
 func statHandler(w http.ResponseWriter, r *http.Request) {
 	println("stateHandler ....")
 	daprClient, err := dapr.NewClient()
@@ -144,14 +162,28 @@ func statHandler(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	api := r.URL.Query().Get("api")
-	curStr, state_err := daprClient.GetState(ctx, stateStoreName, "image-api-"+api)
-	if state_err != nil {
-		fmt.Printf("Failed to persist state: %v\n", state_err)
-	}
+	count, _ := daprClient.GetState(ctx, stateStoreName, countKey, nil)
+	curCount, _ := strconv.ParseInt(string(count.Value), 10, 32)
 
-	resp := make(map[string]string)
-	resp["count"] = string(curStr.Value)
+	println("curCount: ", curCount)
+
+	// get the last 10 events
+	res := make(map[string]string)
+	for i := curCount; i > Max(0, curCount-int64(10)); i-- {
+		eventKey := "event-" + strconv.FormatInt(i, 10)
+		eventVal, _ := daprClient.GetState(ctx, stateStoreName, eventKey, nil)
+		println("eventVal: ", string(eventVal.Value))
+		res[eventKey] = string(eventVal.Value)
+	}
+	keys := make([]string, 0, len(res))
+	for k := range res {
+		keys = append(keys, k)
+	}
+	sort.Sort(sort.Reverse(sort.StringSlice(keys)))
+	resp := make([]string, 0, len(res))
+	for _, k := range keys {
+		resp = append(resp, k+"##"+res[k])
+	}
 	jsonResp, _ := json.Marshal(resp)
 	w.Header().Set("Content-Type", "application/json")
 	fmt.Fprintf(w, "%s", jsonResp)
@@ -161,6 +193,23 @@ func homepageHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 	content, _ := ioutil.ReadFile("./static/home.html")
 	fmt.Print("homepageHandler ....")
+	ctx := context.Background()
+	client, err := dapr.NewClient()
+	if err != nil {
+		panic(err)
+	}
+	option_str := ""
+	for i := 0; i <= 2; i++ {
+		key := "option-" + strconv.Itoa(i)
+		items, err := client.GetConfigurationItem(ctx, "dapr-wasm-config", key)
+		if err != nil {
+			panic(err)
+		}
+		option_key := string((*items).Value)
+		option_val := strings.ReplaceAll(strings.ToLower(option_key), " ", "-")
+		option_str += fmt.Sprintf("\n<option value=\"%s\">%s</option>", option_val, option_key)
+	}
+	content = bytes.Replace(content, []byte("{options}"), []byte(option_str), 1)
 	if content == nil {
 		w.WriteHeader(http.StatusNotFound)
 	} else {
@@ -174,18 +223,9 @@ func init() {
 	}
 	client := redis.NewClient(opts)
 	// set config value
-	client.Set(context.Background(), "mykey", "myConfigValue", -1)
-	ticker := time.NewTicker(time.Second)
-	go func() {
-		for i := 0; i < 5; i++ {
-			<-ticker.C
-			// update config value
-			client.Set(context.Background(), "mySubscribeKey1", "mySubscribeValue"+strconv.Itoa(i+1), -1)
-			client.Set(context.Background(), "mySubscribeKey2", "mySubscribeValue"+strconv.Itoa(i+1), -1)
-			client.Set(context.Background(), "mySubscribeKey3", "mySubscribeValue"+strconv.Itoa(i+1), -1)
-		}
-		ticker.Stop()
-	}()
+	client.Set(context.Background(), "option-0", "Go", -1)
+	client.Set(context.Background(), "option-1", "Rust", -1)
+	client.Set(context.Background(), "option-2", "Rust Wasi Socket", -1)
 }
 
 func main() {

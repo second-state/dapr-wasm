@@ -94,7 +94,15 @@ function updateStat(api) {
         if (status === 200) {
             var res = xhr.response;
             document.getElementById('stat').hidden = false;
-            document.getElementById('stat-text').innerHTML = res.count;
+            console.log(res);
+            let html = "";
+            for (const elem of res) {
+                items = elem.split("##");
+                key = items[0];
+                value = items[1];
+                html += "<tr><td>" + key + "&nbsp</td><td>" + value + "</td></tr><br>";
+            }
+            document.getElementById('stat-text').innerHTML = html;
         }
     };
     xhr.send();

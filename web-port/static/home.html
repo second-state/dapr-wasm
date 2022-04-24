@@ -24,9 +24,7 @@
 
                     <label for="run-api" style="margin-left:10px">API:</label>
                     <select id="run-api" onchange="setButton()" style="margin-right:10px">
-                            <option value="{1}">{1}</option>
-                            <option value="{2}">{2}</option>
-                            <option value="{3}">{3}</option>
+                            {options}
                         </select>
                     <button id="run" onclick="runWasm()" disabled>Classify</button>
                 </div>
@@ -46,7 +44,7 @@
 
                 <div class="row" id="stat" hidden="true" style="margin-top: 30px; margin-right: 20%;align-content: center;">
                     <p>
-                        <label> Stat: </label> <span id="stat-text"> 1 </span>
+                        <label></label> <span id="stat-text"></span>
                     </p>
                 </div>
 
