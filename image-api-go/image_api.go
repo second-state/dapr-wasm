@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/second-state/WasmEdge-go/wasmedge"
+	bindgen "github.com/second-state/wasmedge-bindgen/host/go"
 
 	"github.com/dapr/go-sdk/service/common"
 	daprd "github.com/dapr/go-sdk/service/http"
@@ -29,7 +30,7 @@ func imageHandlerWASI(_ context.Context, in *common.InvocationEvent) (out *commo
 	/// Create VM with configure
 	var vm = wasmedge.NewVMWithConfig(conf)
 
-	/// Init WASI (test)
+	/// Init WASI
 	var wasi = vm.GetImportObject(wasmedge.WASI)
 	wasi.InitWasi(
 		os.Args[1:],     /// The args
@@ -46,16 +47,19 @@ func imageHandlerWASI(_ context.Context, in *common.InvocationEvent) (out *commo
 	vm.RegisterImport(imgobj)
 	/// Instantiate wasm
 
-	vm.LoadWasmFile("./lib/classify_bg.wasm")
+	vm.LoadWasmFile("./lib/classify.wasm")
 	vm.Validate()
-	vm.Instantiate()
+	/// vm.Instantiate()
+	bg := bindgen.Instantiate(vm)
 
-	res, err := vm.ExecuteBindgen("infer", wasmedge.Bindgen_return_array, image)
-	ans := string(res.([]byte))
+	res, err := bg.Execute("infer", image)
+	// ans := string(res[0].([]byte))
+	ans := res[0].(string)
 	if err != nil {
 		println("error: ", err.Error())
 	}
 
+	bg.Release()
 	vm.Release()
 	conf.Release()
 
