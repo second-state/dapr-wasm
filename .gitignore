@@ -11,7 +11,7 @@ restart.sh
 wasmedge-tensorflow-lite
 wasmedgec-tensorflow
 nohup.out
-
+dump.rdb
 install_wasmedge*
 *.log
 

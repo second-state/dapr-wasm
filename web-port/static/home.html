@@ -24,9 +24,9 @@
 
                     <label for="run-api" style="margin-left:10px">API:</label>
                     <select id="run-api" onchange="setButton()" style="margin-right:10px">
-                            <option value="go">Go</option>
-                            <option value="rust">Rust</option>
-                            <option value="rust-wasi-socket">Rust Wasi Socket</option>
+                            <option value="{1}">{1}</option>
+                            <option value="{2}">{2}</option>
+                            <option value="{3}">{3}</option>
                         </select>
                     <button id="run" onclick="runWasm()" disabled>Classify</button>
                 </div>

@@ -8,8 +8,11 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
+
+	"github.com/go-redis/redis/v8"
 
 	dapr "github.com/dapr/go-sdk/client"
 )
@@ -52,12 +55,13 @@ func daprClientSend(image []byte, w http.ResponseWriter, api string) {
 	}
 
 	image_size := len(image)
+	start_time := time.Now()
 	resp, err := client.InvokeMethodWithContent(ctx, "image-api-go", "/api/image", "post", content)
 	if err != nil {
 		panic(err)
 	}
-
-	storeCount(api, fmt.Sprintf("image_size: %d", image_size))
+	cost_time := time.Since(start_time).Seconds()
+	storeCount(api, fmt.Sprintf("image_size: %d cost_time: %.3f", image_size, cost_time))
 
 	log.Printf("dapr-wasmedge-go method api/image has invoked, response: %s", string(resp))
 	fmt.Printf("Image classify result: %q\n", resp)
@@ -88,8 +92,6 @@ func httpClientSend(image []byte, w http.ResponseWriter, api string) {
 	if err != nil {
 		panic(err)
 	}
-	end_time := time.Now()
-
 	//println(resp)
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -98,18 +100,16 @@ func httpClientSend(image []byte, w http.ResponseWriter, api string) {
 
 	old_image_size := float64(len(image)) / 1024
 	process_image_size := float64(len(body)) / 1024
-	cost_time := end_time.Sub(start_time).Seconds()
+	cost_time := time.Since(start_time).Seconds()
 	store_msg := fmt.Sprintf("old_size: %.2f (kb), cur_size: %.2f (kb) cost_time: %.3f (s)",
 		old_image_size, process_image_size, cost_time)
 	storeCount(api, store_msg)
-	fmt.Printf("herrrrrrrrr")
 
 	res := string(body)
 	//println("res: ", res)
 	if strings.Contains(res, "Max bytes limit exceeded") {
 		res = "ImageTooLarge"
 	}
-	fmt.Printf("finished process !!!!!!!!!!!!")
 	w.Header().Set("Content-Type", "image/png")
 	fmt.Fprintf(w, "%s", res)
 }
@@ -157,7 +157,39 @@ func statHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "%s", jsonResp)
 }
 
+func homepageHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html")
+	content, _ := ioutil.ReadFile("./static/home.html")
+	fmt.Print("homepageHandler ....")
+	if content == nil {
+		w.WriteHeader(http.StatusNotFound)
+	} else {
+		fmt.Fprintf(w, "%s", content)
+	}
+}
+
+func init() {
+	opts := &redis.Options{
+		Addr: "127.0.0.1:6379",
+	}
+	client := redis.NewClient(opts)
+	// set config value
+	client.Set(context.Background(), "mykey", "myConfigValue", -1)
+	ticker := time.NewTicker(time.Second)
+	go func() {
+		for i := 0; i < 5; i++ {
+			<-ticker.C
+			// update config value
+			client.Set(context.Background(), "mySubscribeKey1", "mySubscribeValue"+strconv.Itoa(i+1), -1)
+			client.Set(context.Background(), "mySubscribeKey2", "mySubscribeValue"+strconv.Itoa(i+1), -1)
+			client.Set(context.Background(), "mySubscribeKey3", "mySubscribeValue"+strconv.Itoa(i+1), -1)
+		}
+		ticker.Stop()
+	}()
+}
+
 func main() {
+	http.HandleFunc("/static/home.html", homepageHandler)
 	fs := http.FileServer(http.Dir("./static"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 	http.HandleFunc("/api/hello", imageHandler)
