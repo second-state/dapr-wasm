@@ -31,11 +31,7 @@ function fileSelected(e) {
 
 function setButton() {
     var button = document.getElementById("run");
-    if ("go" == getApi()) {
-        button.innerText = "Classify";
-    } else {
-        button.innerText = "Grayscale";
-    }
+    button.innerText = "Grayscale";
     button.disabled = false;
 }
 
@@ -81,6 +77,29 @@ function getApi() {
     return select.options[select.selectedIndex].value;
 }
 
+function updateStat(api) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/api/invokecount?api=' + api, true);
+    xhr.responseType = 'json';
+    xhr.onload = function() {
+        var status = xhr.status;
+        if (status === 200) {
+            var res = xhr.response;
+            document.getElementById('stat').hidden = false;
+            console.log(res);
+            let html = "";
+            for (const elem of res) {
+                items = elem.split("##");
+                key = items[0];
+                value = items[1];
+                html += "<tr><td>" + key + "&nbsp</td><td>" + value + "</td></tr><br>";
+            }
+            document.getElementById('stat-text').innerHTML = html;
+        }
+    };
+    xhr.send();
+}
+
 function runWasm(e) {
     const reader = new FileReader();
     reader.onload = function(e) {
@@ -98,6 +117,7 @@ function runWasm(e) {
                 } else {
                     setRes(req.response);
                 }
+                updateStat(getApi());
             } else {
                 setRes("API error with status: " + req.status);
             }

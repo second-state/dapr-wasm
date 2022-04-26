@@ -47,12 +47,12 @@ func imageHandlerWASI(_ context.Context, in *common.InvocationEvent) (out *commo
 	vm.RegisterImport(imgobj)
 	/// Instantiate wasm
 
-	vm.LoadWasmFile("./lib/classify.wasm")
+	vm.LoadWasmFile("./lib/grayscale_lib.wasm")
 	vm.Validate()
 	/// vm.Instantiate()
 	bg := bindgen.Instantiate(vm)
 
-	res, err := bg.Execute("infer", image)
+	res, err := bg.Execute("grayscale", image)
 	// ans := string(res[0].([]byte))
 	ans := res[0].(string)
 	if err != nil {
@@ -62,10 +62,6 @@ func imageHandlerWASI(_ context.Context, in *common.InvocationEvent) (out *commo
 	bg.Release()
 	vm.Release()
 	conf.Release()
-
-	tfobj.Release()
-	tfliteobj.Release()
-	imgobj.Release()
 
 	fmt.Printf("Image classify result: %q\n", ans)
 	out = &common.Content{

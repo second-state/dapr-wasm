@@ -24,11 +24,9 @@
 
                     <label for="run-api" style="margin-left:10px">API:</label>
                     <select id="run-api" onchange="setButton()" style="margin-right:10px">
-                            <option value="go">Go</option>
-                            <option value="rust">Rust</option>
-                            <option value="rust-wasi-socket">Rust Wasi Socket</option>
+                            {options}
                         </select>
-                    <button id="run" onclick="runWasm()" disabled>Classify</button>
+                    <button id="run" onclick="runWasm()" disabled>Grayscale</button>
                 </div>
                 <div id="infer-rows" style="margin-top: 30px">
                     <div class='infer' id='result' hidden="true"></div>
@@ -43,6 +41,13 @@
                         <img id="processed-pic" hidden="true" src="#" style="width:100%" />
                     </div>
                 </div>
+
+                <div class="row" id="stat" hidden="true" style="margin-top: 30px; margin-right: 20%;align-content: center;">
+                    <p>
+                        <label></label> <span id="stat-text"></span>
+                    </p>
+                </div>
+
             </div>
         </div>
 
