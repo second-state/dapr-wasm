@@ -23,7 +23,7 @@ const (
 	countKey       = `count`
 )
 
-func storeCount(api string, msg string) {
+func storeCount(api string, old_size int, new_size int, start_time time.Time) {
 	daprClient, err := dapr.NewClient()
 	if err != nil {
 		panic(err)
@@ -33,16 +33,27 @@ func storeCount(api string, msg string) {
 
 	var key = "image-api-" + api
 	fmt.Printf("key: %s", key)
-	fmt.Printf("msg: %s", msg)
+
+	old_image_size := float64(old_size) / 1024
+	process_image_size := float64(new_size) / 1024
+	cost_time := time.Since(start_time).Seconds()
+
+	store_msg := fmt.Sprintf("old_size: %.2f (kb), cur_size: %.2f (kb) cost_time: %.3f (s)",
+		old_image_size, process_image_size, cost_time)
 	count, _ := daprClient.GetState(ctx, stateStoreName, countKey, nil)
 	curCount, _ := strconv.ParseInt(string(count.Value), 10, 32)
 	curCount++
 
 	state_err := daprClient.SaveState(ctx, stateStoreName, countKey, []byte(strconv.FormatInt(curCount, 10)), nil)
+	if state_err != nil {
+		fmt.Printf("Failed to persist state: %v\n", state_err)
+	} else {
+		fmt.Printf("Successfully persisted state\n")
+	}
 
 	eventKey := "event-" + strconv.FormatInt(curCount, 10)
 	timestamp := time.Now().Format("2006-01-02 15:04:05")
-	eventVal := fmt.Sprintf("%s,%s,%s", timestamp, key, msg)
+	eventVal := fmt.Sprintf("%s,%s,%s", timestamp, key, store_msg)
 	state_err = daprClient.SaveState(ctx, stateStoreName, eventKey, []byte(eventVal), nil)
 	if state_err != nil {
 		fmt.Printf("Failed to persist state: %v\n", state_err)
@@ -65,18 +76,16 @@ func daprClientSend(image []byte, w http.ResponseWriter, api string) {
 		Data:        image,
 	}
 
-	image_size := len(image)
 	start_time := time.Now()
 	resp, err := client.InvokeMethodWithContent(ctx, "image-api-go", "/api/image", "post", content)
 	if err != nil {
 		panic(err)
 	}
-	cost_time := time.Since(start_time).Seconds()
-	storeCount(api, fmt.Sprintf("image_size: %d cost_time: %.3f", image_size, cost_time))
+	storeCount(api, len(image), len(resp), start_time)
 
-	log.Printf("dapr-wasmedge-go method api/image has invoked, response: %s", string(resp))
-	fmt.Printf("Image classify result: %q\n", resp)
-	w.WriteHeader(http.StatusOK)
+	log.Printf("dapr-wasmedge-go method api/image has invoked, response: %d", len(resp))
+	//fmt.Printf("Image result: %q\n", resp)
+	w.Header().Set("Content-Type", "image/png")
 	fmt.Fprintf(w, "%s", string(resp))
 }
 
@@ -109,12 +118,7 @@ func httpClientSend(image []byte, w http.ResponseWriter, api string) {
 		panic(err)
 	}
 
-	old_image_size := float64(len(image)) / 1024
-	process_image_size := float64(len(body)) / 1024
-	cost_time := time.Since(start_time).Seconds()
-	store_msg := fmt.Sprintf("old_size: %.2f (kb), cur_size: %.2f (kb) cost_time: %.3f (s)",
-		old_image_size, process_image_size, cost_time)
-	storeCount(api, store_msg)
+	storeCount(api, len(image), len(body), start_time)
 
 	res := string(body)
 	//println("res: ", res)

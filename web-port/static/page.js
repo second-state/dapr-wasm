@@ -31,11 +31,7 @@ function fileSelected(e) {
 
 function setButton() {
     var button = document.getElementById("run");
-    if ("go" == getApi()) {
-        button.innerText = "Classify";
-    } else {
-        button.innerText = "Grayscale";
-    }
+    button.innerText = "Grayscale";
     button.disabled = false;
 }
 

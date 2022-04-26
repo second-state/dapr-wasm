@@ -21,6 +21,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cdb031dd78e28731d87d56cc8ffef4a8f36ca26c38fe2de700543e627f8a464a"
 
 [[package]]
+name = "base64"
+version = "0.13.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "904dfeac50f3cdaba28fc6f57fdcddb75f49ed61346676a78c4ffe55877802fd"
+
+[[package]]
 name = "bitflags"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -171,9 +177,13 @@ dependencies = [
 name = "grayscale"
 version = "0.1.0"
 dependencies = [
+ "base64",
  "image",
  "imageproc",
  "wasm-bindgen",
+ "wasmedge-bindgen",
+ "wasmedge-bindgen-macro",
+ "wasmedge_tensorflow_interface",
 ]
 
 [[package]]
@@ -613,6 +623,29 @@ name = "wasm-bindgen-shared"
 version = "0.2.61"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "71f77b681efd0bca6f8ea356cdc2e497538b41d3e2a02afed18ce8f022231d29"
+
+[[package]]
+name = "wasmedge-bindgen"
+version = "0.1.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a384742723ac19a4447c8467d9029f730da50eeee08c8526a2b4fc2f91083dd4"
+
+[[package]]
+name = "wasmedge-bindgen-macro"
+version = "0.1.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3ef569496ed4b6c1f17455b2eb2a4380ba9becc38d7612d14cf42f51479db90e"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "wasmedge_tensorflow_interface"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3f9d119263c7983e469737d6d380e035313fe89b1ce5d0575836662cc3a67740"
 
 [[package]]
 name = "weezl"
