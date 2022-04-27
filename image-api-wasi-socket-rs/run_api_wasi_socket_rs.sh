@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 dapr run --app-id image-api-wasi-socket-rs \
          --app-protocol http \
          --app-port 9005 \
