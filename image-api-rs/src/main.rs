@@ -1,4 +1,5 @@
 use std::env;
+use std::fs;
 use std::io::Write;
 use std::net::Ipv4Addr;
 use std::process::{Command, Stdio};
@@ -60,11 +61,27 @@ pub async fn run_server(port: u16) {
 }
  */
 fn main() {
-    let port_key = "FUNCTIONS_CUSTOMHANDLER_PORT";
-    let _port: u16 = match env::var(port_key) {
-        Ok(val) => val.parse().expect("Custom Handler port is not a number!"),
-        Err(_) => 9004,
-    };
+    let args: Vec<String> = env::args().collect();
+    match args.len() {
+        3 => {
+            let source_file = &args[1];
+            let to_file = &args[2];
+            let image = fs::read(source_file).unwrap();
+            let res = image_process(&image);
+            println!("source: {}", source_file);
+            println!("to: {}", to_file);
+            //println!("image: {:?}", image);
+            fs::write(to_file, &res).unwrap();
+            println!("len: {} => {}", image.len(), res.len());
+        }
+        _ => {
+            let port_key = "FUNCTIONS_CUSTOMHANDLER_PORT";
+            let _port: u16 = match env::var(port_key) {
+                Ok(val) => val.parse().expect("Custom Handler port is not a number!"),
+                Err(_) => 9004,
+            };
 
-    run_server(_port);
+            run_server(_port);
+        }
+    }
 }
