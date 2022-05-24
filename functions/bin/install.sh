@@ -1,5 +1,5 @@
 sudo apt-get update
-sudo apt-get install -y libjpeg-dev libpng-dev
+sudo apt-get install -y libjpeg-dev libpng-dev cmake
 
 wget -q https://raw.githubusercontent.com/dapr/cli/master/install/install.sh -O - | /bin/bash
 ## require docker run in non-root user, refer to https://docs.docker.com/engine/install/linux-postinstall/
