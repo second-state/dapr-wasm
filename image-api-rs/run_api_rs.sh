@@ -1,3 +1,7 @@
+#!/usr/bin/env bash
+
+cargo build --release
+
 dapr run --app-id image-api-rs \
          --app-protocol http \
          --app-port 9004 \

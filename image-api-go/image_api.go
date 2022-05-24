@@ -63,7 +63,7 @@ func imageHandlerWASI(_ context.Context, in *common.InvocationEvent) (out *commo
 	vm.Release()
 	conf.Release()
 
-	fmt.Printf("Image classify result: %q\n", ans)
+	fmt.Printf("Image result: %q\n", len(ans))
 	out = &common.Content{
 		Data:        []byte(ans),
 		ContentType: in.ContentType,

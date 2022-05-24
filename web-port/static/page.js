@@ -24,7 +24,7 @@ function fileSelected(e) {
         origin_img.src = elem.src;
         var button = document.getElementById("run");
         button.removeAttribute("disabled");
-
+        setRes("");
     }
     reader.readAsDataURL(file);
 }

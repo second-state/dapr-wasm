@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 go build &&
 
 dapr run --app-id go-web-port \
