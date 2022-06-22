@@ -21,4 +21,4 @@ pretty_env_logger = "0.4"
 base64 = "0.13.0"
 wasmedge-types = "0.1.1"
 wasmedge-sys = "0.7.0"
-wasmedge-bindgen-host = { path = "wasmedge-bindgen" }
+wasmedge-bindgen-host = "0.2.1"
