@@ -42,7 +42,7 @@ pub fn image_process_wasmedge_sys(buf: &Vec<u8>) -> String {
 
     let image_str = buf.iter().map(|&x| x.to_string()).collect::<Vec<String>>().join(",");
     let params = vec![Param::String(image_str)];
-    match bg.run_wasm("grayscale_str", params) {
+    match bg.run_wasm("grayscale", params) {
         Ok(res) => {
             let output = res.unwrap().pop().unwrap().downcast::<String>().unwrap();
             //println!("Success: {:?}", &output);

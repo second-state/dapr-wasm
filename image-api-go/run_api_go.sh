@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+dapr stop image-api-go
 go build --tags "tensorflow image" &&
 dapr run --app-id image-api-go \
          --app-protocol http \
