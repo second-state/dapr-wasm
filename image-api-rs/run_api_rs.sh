@@ -2,6 +2,10 @@
 
 cargo build --release
 
+dapr stop image-api-rs
+
+export LD_LIBRARY_PATH=/home/coder/.wasmedge/lib64/
+
 dapr run --app-id image-api-rs \
          --app-protocol http \
          --app-port 9004 \

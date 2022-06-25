@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"os/exec"
 	"strings"
 
@@ -18,8 +17,6 @@ import (
 )
 
 func imageHandlerWASI(_ context.Context, in *common.InvocationEvent) (out *common.Content, err error) {
-	image := in.Data
-
 	/// Set not to print debug info
 	wasmedge.SetLogErrorLevel()
 
@@ -30,27 +27,19 @@ func imageHandlerWASI(_ context.Context, in *common.InvocationEvent) (out *commo
 	/// Create VM with configure
 	var vm = wasmedge.NewVMWithConfig(conf)
 
-	/// Init WASI
-	var wasi = vm.GetImportObject(wasmedge.WASI)
-	wasi.InitWasi(
-		os.Args[1:],     /// The args
-		os.Environ(),    /// The envs
-		[]string{".:."}, /// The preopens will be empty
-	)
-
-	/// Register WasmEdge-tensorflow and WasmEdge-image
-	var tfobj = wasmedge.NewTensorflowImportObject()
-	var tfliteobj = wasmedge.NewTensorflowLiteImportObject()
-	vm.RegisterImport(tfobj)
-	vm.RegisterImport(tfliteobj)
-	var imgobj = wasmedge.NewImageImportObject()
-	vm.RegisterImport(imgobj)
-	/// Instantiate wasm
-
-	vm.LoadWasmFile("./lib/grayscale_lib.wasm")
+	vm.LoadWasmFile("./lib/grayscale_lib_origin.wasm")
 	vm.Validate()
 	/// vm.Instantiate()
 	bg := bindgen.Instantiate(vm)
+
+	image := ""
+	for i := 0; i < len(in.Data); i++ {
+		image += fmt.Sprintf("%d,", in.Data[i])
+	}
+	sz := len(image)
+	if sz > 0 && image[sz-1] == ',' {
+		image = image[:sz-1]
+	}
 
 	res, err := bg.Execute("grayscale", image)
 	// ans := string(res[0].([]byte))

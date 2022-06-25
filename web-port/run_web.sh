@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+dapr stop go-web-port
+
 go build &&
 
 dapr run --app-id go-web-port \
