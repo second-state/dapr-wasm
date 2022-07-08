@@ -9,6 +9,7 @@
 [WasmEdge](https://github.com/WasmEdge/WasmEdge) is a open-source, high-performance, extensible, and hardware optimized WebAssembly Virtual Machine for automotive, cloud, AI, and blockchain applications.
 
 In this demonstration App, we create two image processing web services, integrated with Dapr.
+
 This project is built to demonstrate how to use Dapr to integrate Web applications in any programming language, and how WasmEdge can be embed in Go and Rust applications.
 
 ## 2. Architecture
@@ -17,16 +18,15 @@ This project contains 4 Dapr sidecar services:
 
 * The [Web port service](./web-port)
 
-It is a simple Go Web application which is exposed as an endpoint of the whole application.
-It will render a static HTML page for the user to upload an image, and receive the image from the user, redirect request to internal image APIs.
+It is a simple Go Web application which is exposed as an endpoint of the whole application. It will render a static HTML page for the user to upload an image, and receive the image from the user, redirect request to internal image APIs.
 
 * The [image service in WasmEdge](./image-api-wasi-socket-rs)
 
-This Dapr service is written in Rust and compiled to WebAssembly. Running inside WasmEdge Runtime, the WebAssembly bytecode program creates a HTTP service that listens for RPC requests from other Dapr applications, including the [web port](./web-port).
+This Dapr service is written in Rust and compiled to WebAssembly. Running inside WasmEdge Runtime, the WebAssembly bytecode program creates a HTTP service that listens for RPC requests from other Dapr applications.
 
 * The [image service in Golang](./image-api-go)
 
-This Dapr service is written in Golang. It uses `WASI` to call a prebuild wasm file to classify an image using a Tensorflow model.
+This Dapr service is written in Golang. It uses `WASI` to call a prebuild wasm file to grayscale an image.
 
 * The [image service in Rust](./image-api-rs)
 
@@ -134,6 +134,4 @@ dapr list
 ## 6. Online Demo: Dapr-WasmEdge
 
 [Access the demo here](http://23.100.38.125:9000/static/home.html)
-
-![](./doc/demo.png)
 
