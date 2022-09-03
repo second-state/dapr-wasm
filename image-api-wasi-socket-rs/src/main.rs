@@ -16,10 +16,10 @@ async fn grayscale(req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
 
         (&Method::POST, "/") => {
             let image_data = hyper::body::to_bytes(req.into_body()).await?;
-            let detected = image::guess_format(&image);
+            let detected = image::guess_format(&image_data);
             let mut buf = vec![];
             if detected.is_err() {
-                return buf;
+                return Ok(Response::new(Body::from("Unknown image format")));
             }
             //println!("process grayscale ...");
             let image_format_detected = detected.unwrap();
@@ -35,7 +35,7 @@ async fn grayscale(req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
             };
             
             let res = base64::encode(&buf);
-            Ok(Response::new(Body::from(&res)))
+            Ok(Response::new(Body::from(res)))
         }
 
         // Return the 404 Not Found for other routes.
