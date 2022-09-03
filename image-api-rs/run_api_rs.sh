@@ -4,7 +4,9 @@ cargo build --release
 
 dapr stop image-api-rs
 
-export LD_LIBRARY_PATH=/home/coder/.wasmedge/lib64/
+export LD_LIBRARY_PATH=/home/coder/.wasmedge/lib/
+export WASMEDGE_INCLUDE_DIR=$HOME/.wasmedge/include/
+export WASMEDGE_LIB_DIR=$HOME/.wasmedge/lib64/
 
 dapr run --app-id image-api-rs \
          --app-protocol http \
