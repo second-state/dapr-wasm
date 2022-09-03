@@ -1,11 +1,12 @@
 [package]
 name = "image-api-wasi-socket-rs"
 version = "0.1.0"
-authors = ["yukang <moorekang@gmail.com>"]
+authors = ["yukang <moorekang@gmail.com>", "Michael Yuan <michael@secondstate.io>"]
 edition = "2018"
 
 [dependencies]
-wasmedge_wasi_socket = "0.2.0"
+hyper = {git = "https://github.com/WasmEdge/hyper.git", branch = "wasmedge", features = ["http1", "server"]}
+tokio = { git="https://github.com/WasmEdge/tokio.git", branch = "wasmedge", features = ["rt", "macros", "net", "time"]}
 httpcodec = "0.2.3"
 base64 = "0.13.0"
 bytecodec = "0.4.15"
