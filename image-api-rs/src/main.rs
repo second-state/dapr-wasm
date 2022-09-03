@@ -4,9 +4,10 @@ use std::io::Write;
 use std::net::Ipv4Addr;
 use std::process::{Command, Stdio};
 use warp::{http::Response, Filter};
-use wasmedge_sys::*;
 use std::path::Path;
-use wasmedge_bindgen_host::*;
+use wasmedge_sdk::config::*;
+use wasmedge_sdk::*;
+use wasmedge_sdk_bindgen::*;
 
 
 /* This is no use now, replaced with image_process_wasmedge_sys */
@@ -30,18 +31,32 @@ pub fn image_process(buf: &Vec<u8>) -> Vec<u8> {
 }
 
 pub fn image_process_wasmedge_sys(buf: &Vec<u8>) -> String {
-    let mut config = Config::create().unwrap();
-	config.wasi(true);
+    let common_options = CommonConfigOptions::default()
+    .bulk_memory_operations(true)
+    .multi_value(true)
+    .mutable_globals(true)
+    .non_trap_conversions(true)
+    .reference_types(true)
+    .sign_extension_operators(true)
+    .simd(true);
 
-	let mut vm = Vm::create(Some(config), None).unwrap();
-	let wasm_path = Path::new("./lib/grayscale_lib_origin.wasm");
-	let _ = vm.load_wasm_from_file(wasm_path);
-	let _ = vm.validate();
+    let host_options = HostRegistrationConfigOptions::default()
+        .wasi(true)
+        .wasmedge_process(false);
 
-	let mut bg = Bindgen::new(vm);
+    let config = ConfigBuilder::new(common_options)
+        .with_host_registration_config(host_options)
+        .build()
+        .unwrap();
+
+    let vm = Vm::new(Some(config)).unwrap();
+    let wasm_path = Path::new("./lib/grayscale_lib_origin.wasm");
+    let module = Module::from_file(None, wasm_path).unwrap();
+    let vm = vm.register_module(None, module).unwrap();
+    let mut bg = Bindgen::new(vm);
 
     let image_str = buf.iter().map(|&x| x.to_string()).collect::<Vec<String>>().join(",");
-    let params = vec![Param::String(image_str)];
+    let params = vec![Param::String(&image_str)];
     match bg.run_wasm("grayscale", params) {
         Ok(res) => {
             let output = res.unwrap().pop().unwrap().downcast::<String>().unwrap();
