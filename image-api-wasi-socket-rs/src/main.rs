@@ -11,7 +11,7 @@ async fn grayscale(req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
     match (req.method(), req.uri().path()) {
         // Serve some instructions at /
         (&Method::GET, "/") => Ok(Response::new(Body::from(
-            "Try POSTing data to /grayscale such as: `curl http://localhost:3000/classify -X POST --data-binary '@grace_hopper.jpg'`",
+            "Try POSTing data to /grayscale such as: `curl http://localhost:9005/ -X POST --data-binary '@my_img.png'`",
         ))),
 
         (&Method::POST, "/") => {
