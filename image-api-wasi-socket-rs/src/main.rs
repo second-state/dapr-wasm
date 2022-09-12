@@ -1,5 +1,7 @@
 use std::net::SocketAddr;
 
+use std::convert::TryFrom;
+use wasmedge_http_req::{request::{Request as WasmEdgeRequest, Method as WasmEdgeMethod, HttpVersion}, uri::Uri};
 use hyper::server::conn::Http;
 use hyper::service::service_fn;
 use hyper::{Body, Method, Request, Response, StatusCode};
@@ -36,6 +38,30 @@ async fn grayscale(req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
             
             let res = base64::encode(&buf);
             Ok(Response::new(Body::from(res)))
+        }
+
+        (&Method::GET, "/v1.0/state/statestore") => Ok(Response::new(Body::from(
+            "Try saving state by POSTing data to /v1.0/state/statestore such as: `curl -X POST -H \"Content-Type: application/json\" -d '[{ \"key\": \"name\", \"value\": \"Bruce\"}]' http://localhost:9005/v1.0/state/statestore`",
+        ))),
+
+        (&Method::POST, "/v1.0/state/statestore") => {
+            let _uri = Uri::try_from("http://localhost:3503/v1.0/state/statestore").unwrap();
+            let mut writer = Vec::new(); //container for body of a response
+            let whole_body: &[u8] = &hyper::body::to_bytes(req.into_body()).await?;
+            // println!("{:?}", String::from_utf8_lossy(whole_body));
+
+            let res = WasmEdgeRequest::new(&_uri)
+                .method(WasmEdgeMethod::POST)
+                .version(HttpVersion::Http11)
+                .header("Content-Length", &whole_body.len())
+                .header("Content-Type", "application/json")
+                .body(whole_body)
+                .send(&mut writer)
+                .unwrap();
+            
+            println!("{:?}", String::from_utf8_lossy(&writer));
+
+            Ok(Response::new(Body::from("OK")))
         }
 
         // Return the 404 Not Found for other routes.
