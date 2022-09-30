@@ -1,7 +1,8 @@
-use std::net::SocketAddr;
+#![deny(warnings)]
+#![warn(rust_2018_idioms)]
+use hyper::{body::HttpBody as _, Client};
 
-use std::convert::TryFrom;
-use wasmedge_http_req::{request::{Request as WasmEdgeRequest, Method as WasmEdgeMethod, HttpVersion}, uri::Uri};
+use std::net::SocketAddr;
 use hyper::server::conn::Http;
 use hyper::service::service_fn;
 use hyper::{Body, Method, Request, Response, StatusCode};
@@ -9,7 +10,7 @@ use tokio::net::TcpListener;
 
 use image::{ImageFormat, ImageOutputFormat};
 
-async fn grayscale(req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
+async fn grayscale(req: Request<Body>) -> Result<Response<Body>, Box<dyn std::error::Error + Send + Sync>> {
     match (req.method(), req.uri().path()) {
         // Serve some instructions at /
         (&Method::GET, "/") => Ok(Response::new(Body::from(
@@ -45,23 +46,13 @@ async fn grayscale(req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
         ))),
 
         (&Method::POST, "/v1.0/state/statestore") => {
-            let _uri = Uri::try_from("http://localhost:3503/v1.0/state/statestore").unwrap();
-            let mut writer = Vec::new(); //container for body of a response
-            let whole_body: &[u8] = &hyper::body::to_bytes(req.into_body()).await?;
-            // println!("{:?}", String::from_utf8_lossy(whole_body));
-
-            let res = WasmEdgeRequest::new(&_uri)
-                .method(WasmEdgeMethod::POST)
-                .version(HttpVersion::Http11)
-                .header("Content-Length", &whole_body.len())
-                .header("Content-Type", "application/json")
-                .body(whole_body)
-                .send(&mut writer)
-                .unwrap();
-            
-            println!("{:?}", String::from_utf8_lossy(&writer));
-
-            Ok(Response::new(Body::from("OK")))
+            let url_str = "http://localhost:3503/v1.0/state/statestore/";
+            const POST_BODY: &[u8] = br#"[{ "key": "name", "value": "Bruce"}]"#;
+            println!("\nPOST and get result as string: {}", url_str);
+            println!("with a POST body: {:?}", String::from_utf8_lossy(POST_BODY));
+            let url = url_str.parse::<hyper::Uri>().unwrap();
+            post_url_return_str(url, POST_BODY).await?;
+            Ok(Response::new(Body::from("Successfull post")))
         }
 
         // Return the 404 Not Found for other routes.
@@ -72,6 +63,28 @@ async fn grayscale(req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
         }
     }
 }
+
+
+async fn post_url_return_str (url: hyper::Uri, post_body: &'static [u8]) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    let client = Client::new();
+    let req = Request::builder()
+        .method(Method::POST)
+        .uri(url)
+        .header("Content-Length", post_body.len())
+        .header("Content-Type", "application/json")
+        .body(Body::from(post_body))?;
+    let mut res = client.request(req).await?;
+
+    let mut resp_data = Vec::new();
+    while let Some(next) = res.data().await {
+        let chunk = next?;
+        resp_data.extend_from_slice(&chunk);
+    }
+    println!("{}", String::from_utf8_lossy(&resp_data));
+
+    Ok(())
+}
+
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {

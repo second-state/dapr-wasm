@@ -5,8 +5,8 @@ authors = ["yukang <moorekang@gmail.com>", "Michael Yuan <michael@secondstate.io
 edition = "2018"
 
 [dependencies]
-hyper = {git = "https://github.com/WasmEdge/hyper.git", branch = "wasmedge", features = ["http1", "server"]}
-tokio = { git="https://github.com/WasmEdge/tokio.git", branch = "wasmedge", features = ["rt", "macros", "net", "time"]}
+hyper = {git = "https://github.com/WasmEdge/hyper.git", branch = "wasmedge", features = ["full"]}
+tokio = { git="https://github.com/WasmEdge/tokio.git", features = ["rt", "macros", "net", "time", "io-util"]}
 base64 = "0.13.0"
 image = { version = "0.23.0", default-features = false, features = ["jpeg", "png", "gif"] }
 imageproc = "0.21.0"
