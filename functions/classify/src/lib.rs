@@ -1,6 +1,7 @@
 #![allow(unused_imports)]
 use wasmedge_bindgen::*;
 use wasmedge_bindgen_macro::*;
+
 mod infer;
 
 #[wasmedge_bindgen]
