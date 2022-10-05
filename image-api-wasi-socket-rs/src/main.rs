@@ -35,7 +35,6 @@ async fn grayscale(req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
             };
             
             let res = base64::encode(&buf);
-            println!("res: {:?}", res);
             Ok(Response::new(Body::from(res)))
         }
 
