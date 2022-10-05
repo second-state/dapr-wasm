@@ -11,17 +11,17 @@ async fn grayscale(req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
     match (req.method(), req.uri().path()) {
         // Serve some instructions at /
         (&Method::GET, "/") => Ok(Response::new(Body::from(
-            "Try POSTing data to /grayscale such as: `curl http://localhost:9005/ -X POST --data-binary '@my_img.png'`",
+            "Try POSTing data to /grayscale such as: `curl http://localhost:9005/image -X POST --data-binary '@my_img.png'`",
         ))),
 
-        (&Method::POST, "/") => {
+        (&Method::POST, "/image") => {
             let image_data = hyper::body::to_bytes(req.into_body()).await?;
             let detected = image::guess_format(&image_data);
             let mut buf = vec![];
             if detected.is_err() {
                 return Ok(Response::new(Body::from("Unknown image format")));
             }
-            //println!("process grayscale ...");
+            println!("process grayscale ...");
             let image_format_detected = detected.unwrap();
             let img = image::load_from_memory(&image_data).unwrap();
             let filtered = img.grayscale();
@@ -35,6 +35,7 @@ async fn grayscale(req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
             };
             
             let res = base64::encode(&buf);
+            println!("res: {:?}", res);
             Ok(Response::new(Body::from(res)))
         }
 

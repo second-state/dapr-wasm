@@ -198,7 +198,7 @@ func homepageHandler(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	option_str := ""
-	for i := 0; i <= 2; i++ {
+	for i := 0; i <= 0; i++ {
 		key := "option-" + strconv.Itoa(i)
 		items, err := client.GetConfigurationItem(ctx, "dapr-wasm-config", key)
 		if err != nil {
@@ -222,9 +222,9 @@ func init() {
 	}
 	client := redis.NewClient(opts)
 	// set config value
-	client.Set(context.Background(), "option-0", "Go", -1)
-	client.Set(context.Background(), "option-1", "Rust", -1)
-	client.Set(context.Background(), "option-2", "Rust Wasi Socket", -1)
+	//client.Set(context.Background(), "option-0", "Go", -1)
+	//client.Set(context.Background(), "option-1", "Rust", -1)
+	client.Set(context.Background(), "option-0", "Rust Wasi Socket", -1)
 }
 
 func main() {

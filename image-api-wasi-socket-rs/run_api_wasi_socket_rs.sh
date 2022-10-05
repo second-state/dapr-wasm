@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+dapr stop image-api-wasi-socket-rs
 dapr run --app-id image-api-wasi-socket-rs \
          --app-protocol http \
          --app-port 9005 \
@@ -7,3 +8,4 @@ dapr run --app-id image-api-wasi-socket-rs \
          --components-path ../config \
          --log-level debug \
 	 wasmedge ./target/wasm32-wasi/debug/image-api-wasi-socket-rs-opt.wasm
+

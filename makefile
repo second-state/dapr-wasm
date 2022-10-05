@@ -7,16 +7,6 @@ build-wasm:
 	cd functions/grayscale && ./build.sh 
 	cd functions/classify && ./build.sh 
 
-build-api-go:
-	cd image-api-go && go build --tags "tensorflow image"
-run-api-go:
-	cd image-api-go && ./run_api_go.sh
-
-build-api-rs:
-	cd image-api-rs && cargo build --release
-run-api-rs:
-	cd image-api-rs && ./run_api_rs.sh
-
 build-api-wasi-socket-rs:
 	cd image-api-wasi-socket-rs && ./build.sh
 run-api-wasi-socket-rs:
@@ -27,5 +17,5 @@ build-web:
 run-web:
 	cd web-port; ./run_web.sh
 
-build: build-wasm build-api-go build-api-rs build-api-wasi-socket-rs build-web
+build: build-wasm build-api-wasi-socket-rs build-web
 
