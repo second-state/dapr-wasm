@@ -31,7 +31,7 @@ function fileSelected(e) {
 
 function setButton() {
     var button = document.getElementById("run");
-    button.innerText = "Grayscale";
+    button.innerText = "Submit";
     button.disabled = false;
 }
 

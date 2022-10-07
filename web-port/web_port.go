@@ -91,14 +91,17 @@ func daprClientSend(image []byte, w http.ResponseWriter, api string) {
 
 func httpClientSend(image []byte, w http.ResponseWriter, api string) {
 	client := &http.Client{}
-	fmt.Printf("httpClientSend ....")
+	fmt.Printf("httpClientSend ....", api)
 
 	// Dapr api format: http://localhost:<daprPort>/v1.0/invoke/<appId>/method/<method-name>
 	var uri string
-	if api == "rust" {
-		uri = "http://localhost:3502/v1.0/invoke/image-api-rs/method/api/image"
+	var response_type string
+	if api == "classify" {
+		uri = "http://localhost:3504/v1.0/invoke/image-api-classify/method/classify"
+		response_type = "text/plain"
 	} else {
-		uri = "http://localhost:3503/v1.0/invoke/image-api-wasi-socket-rs/method/image"
+		uri = "http://localhost:3503/v1.0/invoke/image-api-grayscale/method/grayscale"
+		response_type = "image/png"
 	}
 	println("uri: ", uri)
 
@@ -112,7 +115,7 @@ func httpClientSend(image []byte, w http.ResponseWriter, api string) {
 	if err != nil {
 		panic(err)
 	}
-	//println(resp)
+	println(resp.Header.Get("Content-Type"))
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		panic(err)
@@ -125,7 +128,8 @@ func httpClientSend(image []byte, w http.ResponseWriter, api string) {
 	if strings.Contains(res, "Max bytes limit exceeded") {
 		res = "ImageTooLarge"
 	}
-	w.Header().Set("Content-Type", "image/png")
+
+	w.Header().Set("Content-Type", response_type)
 	fmt.Fprintf(w, "%s", res)
 }
 
@@ -198,7 +202,7 @@ func homepageHandler(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	option_str := ""
-	for i := 0; i <= 0; i++ {
+	for i := 0; i <= 1; i++ {
 		key := "option-" + strconv.Itoa(i)
 		items, err := client.GetConfigurationItem(ctx, "dapr-wasm-config", key)
 		if err != nil {
@@ -222,9 +226,8 @@ func init() {
 	}
 	client := redis.NewClient(opts)
 	// set config value
-	//client.Set(context.Background(), "option-0", "Go", -1)
-	//client.Set(context.Background(), "option-1", "Rust", -1)
-	client.Set(context.Background(), "option-0", "Rust Wasi Socket", -1)
+	client.Set(context.Background(), "option-0", "Grayscale", -1)
+	client.Set(context.Background(), "option-1", "Classify", -1)
 }
 
 func main() {
