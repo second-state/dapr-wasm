@@ -24,8 +24,9 @@
 
                     <label for="run-api" style="margin-left:10px">API:</label>
                     <select id="run-api" onchange="setButton()" style="margin-right:10px">
-                            {options}
-                        </select>
+                        <option value="grayscale">Grayscale</option>
+                        <option value="classify">Classify</option>
+                    </select>
                     <button id="run" onclick="runWasm()" disabled>Submit</button>
                 </div>
                 <div id="infer-rows" style="margin-top: 30px">
