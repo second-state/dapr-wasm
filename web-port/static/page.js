@@ -79,7 +79,7 @@ function getApi() {
 
 function updateStat(api) {
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', '/api/invokecount?api=' + api, true);
+    xhr.open('GET', 'http://23.100.38.125:9000/api/invokecount?api=' + api, true);
     xhr.responseType = 'json';
     xhr.onload = function() {
         var status = xhr.status;
