@@ -2,11 +2,10 @@
 
 dapr list
 
-pushd image-api-wasi-socket-rs
-nohup ./run_api_wasi_socket_rs.sh > nohup.log & 
+pushd image-api-classify
+nohup ./run_classify.sh > nohup.log & 
 popd
 
-pushd web-port
-nohup ./run_web.sh > nohup.log & 
+push d image-api-grayscale
+nohup ./run_grayscale.sh > nohup.log &
 popd
-
