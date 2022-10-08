@@ -105,7 +105,7 @@ function runWasm(e) {
     reader.onload = function(e) {
         setLoading(true);
         var req = new XMLHttpRequest();
-        req.open("POST", '/api/hello', true);
+        req.open("POST", 'http://23.100.38.125:9000/api/hello', true);
         req.setRequestHeader('api', getApi());
         req.onload = function() {
             setLoading(false);

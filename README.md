@@ -1,6 +1,6 @@
 ## Demo and tutorials
 
-[Live Demo](http://23.100.38.125:9000/static/home.html) | [Tutorial article](https://www.infoq.com/articles/webassembly-dapr-wasmedge/) | [Tutorial video](https://youtu.be/t_sQP6Qpf7U)
+[Live Demo](http://23.100.38.125:9000/static/) | [Tutorial article](https://www.infoq.com/articles/webassembly-dapr-wasmedge/) | [Tutorial video](https://youtu.be/t_sQP6Qpf7U)
 
 ## 1. Introduction
 
@@ -133,5 +133,5 @@ dapr list
 
 ## 6. Online Demo: Dapr-WasmEdge
 
-[Access the demo here](http://23.100.38.125:9000/static/home.html)
+[Access the demo here](http://23.100.38.125:9000/static/)
 
