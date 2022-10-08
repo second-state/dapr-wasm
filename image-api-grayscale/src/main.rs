@@ -38,7 +38,11 @@ async fn grayscale(req: Request<Body>) -> Result<Response<Body>, Box<dyn std::er
             };
             
             let res = base64::encode(&buf);
-            Ok(Response::new(Body::from(res)))
+            let response = Response::builder()
+                .header("Content-Type", "image/png")
+                .body(Body::from(res))
+                .unwrap();
+            Ok(response)
         }
 
         (&Method::GET, "/v1.0/state/statestore") => Ok(Response::new(Body::from(
