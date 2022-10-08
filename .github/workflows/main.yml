@@ -60,6 +60,7 @@ jobs:
         cargo build --target wasm32-wasi --release
         wasmedgec target/wasm32-wasi/release/events_service.wasm events_service.wasm
         nohup dapr run --app-id events-service --app-protocol http --app-port 9007 --dapr-http-port 3505 --components-path ../config --log-level debug wasmedge events_service.wasm > server.log 2>&1 &
+        sleep 10
 
     - name: Run tests
       run: |
