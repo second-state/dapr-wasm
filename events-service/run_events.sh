@@ -10,3 +10,5 @@ dapr run --app-id events-service \
         --log-level debug \
         --components-path ../config \
         wasmedge events_service.wasm
+sleep 10
+curl http://localhost:9007/init

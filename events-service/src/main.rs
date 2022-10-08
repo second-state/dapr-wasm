@@ -97,10 +97,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     sleep(Duration::from_millis(1500)).await;
 
     let client = dapr::Dapr::new(3505);
-    let db_url_v = client.get_secret("local-store", "DB_URL:MYSQL").await?;
-    let db_url = db_url_v.as_str().unwrap();
+    let db_url = client.get_secret("local-store", "DB_URL:MYSQL").await?.to_string();
 
-    let opts = Opts::from_url(db_url).unwrap();
+    let opts = Opts::from_url(&db_url).unwrap();
     let builder = OptsBuilder::from_opts(opts);
     // The connection pool will have a min of 5 and max of 10 connections.
     let constraints = PoolConstraints::new(5, 10).unwrap();

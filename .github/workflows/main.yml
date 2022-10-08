@@ -64,9 +64,9 @@ jobs:
 
     - name: Run tests
       run: |
-        cat image-api-classify/server.log
         cat events-service/server.log
         cd docs
+        curl http://localhost:9007/init
         curl -o /dev/null http://localhost:9005/grayscale -X POST --data-binary '@food.jpg'
         curl http://localhost:9006/classify -X POST --data-binary '@food.jpg'
         curl http://localhost:9007/events
