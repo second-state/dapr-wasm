@@ -1,0 +1,85 @@
+name: main
+
+on:
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'info'
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-20.04
+
+    steps:
+    - uses: actions/checkout@v2
+      
+    - name: Install apt-get packages
+      run: |
+        sudo ACCEPT_EULA=Y apt-get update
+        sudo ACCEPT_EULA=Y apt-get upgrade
+        sudo apt-get install wget git curl software-properties-common build-essential libjpeg-dev libpng-dev cmake
+    
+    - name: Install Rust target for wasm
+      run: |
+        rustup target add wasm32-wasi
+        
+    - name: Install WasmEdge
+      run: |
+        VERSION=0.11.1
+        curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | sudo bash -s -- -e all --version=$VERSION --tf-version=$VERSION --tf-deps-version=$VERSION --tf-tools-version=$VERSION --image-version=$VERSION --image-deps-version=$VERSION  -p /usr/local
+        
+    - name: Install and init dapr
+      run: |
+        wget -q https://raw.githubusercontent.com/dapr/cli/master/install/install.sh -O - | /bin/bash
+        dapr init
+    
+    - name: Run grayscale
+      run: |
+        cd image-api-grayscale
+        cargo build --target wasm32-wasi --release
+        wasmedgec target/wasm32-wasi/release/image-api-grayscale.wasm image-api-grayscale.wasm
+        nohup dapr run --app-id image-api-grayscale --app-protocol http --app-port 9005 --dapr-http-port 3503 --components-path ../config --log-level debug wasmedge image-api-grayscale.wasm > server.log 2>&1 &
+
+    - name: Run classify
+      run: |
+        cd image-api-classify
+        cargo build --target wasm32-wasi --release
+        wasmedgec target/wasm32-wasi/release/wasmedge_hyper_server_tflite.wasm wasmedge_hyper_server_tflite.wasm
+        nohup dapr run --app-id image-api-classify --app-protocol http --app-port 9006 --dapr-http-port 3504 --components-path ../config --log-level debug wasmedge-tensorflow-lite wasmedge_hyper_server_tflite.wasm > server.log 2>&1 &
+
+    - name: Run events service
+      run: |
+        cd events-service
+        cargo build --target wasm32-wasi --release
+        wasmedgec target/wasm32-wasi/release/events_service.wasm events_service.wasm
+        nohup dapr run --app-id events-service --app-protocol http --app-port 9007 --dapr-http-port 3505 --components-path ../config --log-level debug wasmedge events_service.wasm > server.log 2>&1 &
+
+    - name: Run tests
+      run: |
+        cd docs
+        curl http://localhost:9005/grayscale -X POST --data-binary '@food.jpg'
+        curl http://localhost:9006/classify -X POST --data-binary '@food.jpg'
+        curl http://localhost:9007/events
+
+    - name: Dump the grayscale server log
+      run: |
+        cd image-api-grayscale
+        cat server.log
+
+    - name: Dump the classify server log
+      run: |
+        cd image-api-classify
+        cat server.log
+
+    - name: Dump the events server log
+      run: |
+        cd events-service
+        cat server.log
+
