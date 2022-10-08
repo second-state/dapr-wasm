@@ -1,0 +1,187 @@
+html,
+body {
+    padding: 0;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+.column {
+    float: left;
+    width: 33.33%;
+    padding: 8px;
+}
+
+
+/* Clearfix (clear floats) */
+
+.row::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+.container {
+    min-height: 100vh;
+    padding: 0 0.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.main {
+    padding: 5rem 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.footer {
+    width: 100%;
+    height: 100px;
+    border-top: 1px solid #eaeaea;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.footer img {
+    margin-left: 0.5rem;
+}
+
+.footer a {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.title a {
+    color: #0070f3;
+    text-decoration: none;
+}
+
+.title a:hover,
+.title a:focus,
+.title a:active {
+    text-decoration: underline;
+}
+
+.title {
+    margin: 0;
+    line-height: 1.15;
+    font-size: 4rem;
+    text-align: center;
+}
+
+.logo {
+    height: 1em;
+}
+
+.visually-hidden {
+    position: absolute !important;
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+    clip: rect(1px, 1px, 1px, 1px);
+}
+
+input.visually-hidden+label {
+    background-color: #0070f3;
+    border-radius: 5px;
+    color: white;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+input.visually-hidden+label:hover {
+    background-color: #1373e4;
+}
+
+input.visually-hidden+label:active {
+    background-color: #1f6bc3;
+}
+
+input.visually-hidden:focus+label {
+    outline: thin dotted;
+}
+
+input.visually-hidden:focus-within+label {
+    outline: thin dotted;
+}
+
+.operating {
+    margin: 2rem 0;
+}
+
+.operating>div {
+    width: 100%;
+    text-align: center;
+}
+
+.operating button {
+    background-color: #0070f3;
+    border-radius: 5px;
+    color: white;
+    padding: 5px 10px;
+    cursor: pointer;
+    border: 0;
+    font-size: 0.9em;
+}
+
+.operating button:hover {
+    background-color: #1373e4;
+}
+
+.operating button:active {
+    background-color: #1f6bc3;
+}
+
+.operating button:disabled {
+    background-color: #eaeaea;
+    cursor: not-allowed;
+}
+
+.noselect {
+    -webkit-touch-callout: none;
+    /* iOS Safari */
+    -webkit-user-select: none;
+    /* Safari */
+    -khtml-user-select: none;
+    /* Konqueror HTML */
+    -moz-user-select: none;
+    /* Old versions of Firefox */
+    -ms-user-select: none;
+    /* Internet Explorer/Edge */
+    user-select: none;
+    /* Non-prefixed version, currently
+                                    supported by Chrome, Edge, Opera and Firefox */
+}
+
+.thumb {
+    margin-top: 1rem;
+}
+
+.thumb img {
+    max-width: 800px;
+}
+
+.infer {
+    margin: 1rem 0;
+}
+
+.infer a {
+    color: #1f6bc3;
+    text-decoration: underline;
+}

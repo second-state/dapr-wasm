@@ -14,4 +14,4 @@ nohup.out
 dump.rdb
 install_wasmedge*
 *.log
-
+target
