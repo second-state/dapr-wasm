@@ -1,6 +1,6 @@
 
 pre-install:
-	cd functions/bin && ./install.sh
+	./install.sh
 
 run-api-grayscale:
 	cd image-api-grayscale && ./run_grayscale.sh

@@ -1,17 +1,7 @@
-server
-vendor
-web-port/web-port
-image-api-go/image-api-go
 *.Identifier
 *.wasm
 *.so
 *.o
 *.log
-restart.sh
-wasmedge-tensorflow-lite
-wasmedgec-tensorflow
-nohup.out
 dump.rdb
-install_wasmedge*
-*.log
 target
