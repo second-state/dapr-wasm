@@ -1,5 +1,5 @@
 use std::net::SocketAddr;
-
+use serde_json::json;
 use hyper::server::conn::Http;
 use hyper::service::service_fn;
 use hyper::{Body, Method, Request, Response, StatusCode};
@@ -7,13 +7,13 @@ use tokio::net::TcpListener;
 
 /// This is our service handler. It receives a Request, routes on its
 /// path, and returns a Future of a Response.
-async fn classify(req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
+async fn classify(req: Request<Body>) -> Result<Response<Body>, anyhow::Error> {
     let model_data: &[u8] = include_bytes!("models/mobilenet_v1_1.0_224/mobilenet_v1_1.0_224_quant.tflite");
     let labels = include_str!("models/mobilenet_v1_1.0_224/labels_mobilenet_quant_v1_224.txt");
     match (req.method(), req.uri().path()) {
         // Serve some instructions at /
         (&Method::GET, "/") => Ok(Response::new(Body::from(
-            "Try POSTing data to /classify such as: `curl http://localhost:3000/classify -X POST --data-binary '@grace_hopper.jpg'`",
+            "Try POSTing data to /classify such as: `curl http://localhost:9006/classify -X POST --data-binary '@grace_hopper.jpg'`",
         ))),
 
         (&Method::POST, "/classify") => {
@@ -42,8 +42,13 @@ async fn classify(req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
                 label_lines.next();
             }
             let class_name = label_lines.next().unwrap().to_string();
-
             println!("result: {}", class_name);
+
+            let client = dapr::Dapr::new(3504);
+            let kvs = json!({ "op_type": "classify", "input_size": buf.len() });
+            client.invoke_service("events-service", "create-event", kvs).await?;
+
+
             Ok(Response::new(Body::from(format!("{} is detected with {}/255 confidence", class_name, max_value))))
         }
 
