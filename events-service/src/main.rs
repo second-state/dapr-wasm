@@ -97,7 +97,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     sleep(Duration::from_millis(1500)).await;
 
     let client = dapr::Dapr::new(3505);
-    let db_url = client.get_secret("local-store", "DB_URL:MYSQL").await?.to_string();
+    let v = client.get_secret("local-store", "DB_URL:MYSQL").await?;
+    println!("DB_URL:MYSQL value is {}", v);
+    let db_url = v["DB_URL:MYSQL"].to_string();
 
     let opts = Opts::from_url(&db_url).unwrap();
     let builder = OptsBuilder::from_opts(opts);
