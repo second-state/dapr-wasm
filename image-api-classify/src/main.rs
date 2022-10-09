@@ -1,11 +1,11 @@
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{Body, Method, Request, Response, StatusCode, Server};
+use hyper::header::*;
 use std::convert::Infallible;
 use std::net::SocketAddr;
 use std::result::Result;
 use chrono::prelude::*;
 use serde_json::json;
-// use hyper::server::conn::AddrStream;
 
 /// This is our service handler. It receives a Request, routes on its
 /// path, and returns a Future of a Response.
@@ -20,8 +20,15 @@ async fn classify(req: Request<Body>) -> Result<Response<Body>, anyhow::Error> {
 
         (&Method::POST, "/classify") => {
             let headers = req.headers().to_owned();
-            let referer = headers.get("Referer").unwrap().to_str().unwrap();
-            println!("IP is {}", referer);
+            let mut ip = "0.0.0.0";
+            if headers.contains_key(REFERER) {
+                ip = headers.get(REFERER).unwrap().to_str().unwrap();
+            } else if headers.contains_key("REMOTE_ADDR") {
+                ip = headers.get("REMOTE_ADDR").unwrap().to_str().unwrap();
+            } else if headers.contains_key(USER_AGENT) {
+                ip = headers.get(USER_AGENT).unwrap().to_str().unwrap();
+            }
+            println!("IP is {}", ip);
 
             let buf = hyper::body::to_bytes(req.into_body()).await?;
             let flat_img = wasmedge_tensorflow_interface::load_jpg_image_to_rgb8(&buf, 224, 224);
@@ -57,7 +64,7 @@ async fn classify(req: Request<Body>) -> Result<Response<Body>, anyhow::Error> {
             client.invoke_service("events-service", "create_event", kvs).await?;
 
             let kvs = json!([{ 
-                "key": referer, 
+                "key": ip, 
                 // "key": "0.0.0.0", 
                 "value": Utc::now().timestamp_millis()
             }]);
