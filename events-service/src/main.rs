@@ -10,7 +10,6 @@ use tokio::time::{sleep, Duration};
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Event {
-    event_id: i32,
     event_ts: String,
     op_type: i32, // 1: grayscale; 2: classify
     input_size: i32,
@@ -18,13 +17,11 @@ struct Event {
 
 impl Event {
     fn new(
-        event_id: i32,
         event_ts: String,
         op_type: i32,
         input_size: i32,
     ) -> Self {
         Self {
-            event_id,
             event_ts,
             op_type,
             input_size,
@@ -52,7 +49,7 @@ async fn handle_request(req: Request<Body>, pool: Pool) -> Result<Response<Body>
             println!("GET conn");
             "DROP TABLE IF EXISTS image_evts;".ignore(&mut conn).await?;
             println!("DROPPED table");
-            "CREATE TABLE image_evts (event_id INT AUTO_INCREMENT, event_ts VARCHAR(20), op_type INT, input_size INT);".ignore(&mut conn).await?;
+            "CREATE TABLE image_evts (event_ts VARCHAR(20), op_type INT, input_size INT);".ignore(&mut conn).await?;
             println!("CREATED table");
             drop(conn);
             println!("Dropped conn");
@@ -63,11 +60,12 @@ async fn handle_request(req: Request<Body>, pool: Pool) -> Result<Response<Body>
             let mut conn = pool.get_conn().await.unwrap();
 
             let byte_stream = hyper::body::to_bytes(req).await?;
-            let event: Event = serde_json::from_slice(&byte_stream).unwrap();
+            let mut event: Event = serde_json::from_slice(&byte_stream).unwrap();
+            event.event_ts = "2022-10-09 12:26:30".to_string();
 
             "INSERT INTO image_evts (event_ts, op_type, input_size) VALUES (:event_ts, :op_type, :input_size)"
                 .with(params! {
-                    "event_ts" => "2022-10-09 12:26:30",
+                    "event_ts" => event.event_ts,
                     "op_type" => event.op_type,
                     "input_size" => event.input_size,
                 })
@@ -83,9 +81,8 @@ async fn handle_request(req: Request<Body>, pool: Pool) -> Result<Response<Body>
 
             let events = "SELECT * FROM image_evts"
                 .with(())
-                .map(&mut conn, |(event_id, event_ts, op_type, input_size)| {
+                .map(&mut conn, |(event_ts, op_type, input_size)| {
                     Event::new(
-                        event_id,
                         event_ts,
                         op_type,
                         input_size,
