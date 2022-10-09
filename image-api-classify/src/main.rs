@@ -4,6 +4,8 @@ use hyper::server::conn::Http;
 use hyper::service::service_fn;
 use hyper::{Body, Method, Request, Response, StatusCode};
 use tokio::net::TcpListener;
+use chrono::prelude::*;
+use hyper::header::HeaderName;
 
 /// This is our service handler. It receives a Request, routes on its
 /// path, and returns a Future of a Response.
@@ -48,6 +50,8 @@ async fn classify(req: Request<Body>) -> Result<Response<Body>, anyhow::Error> {
             // let client = dapr::Dapr::new(3505);
             let kvs = json!({ "op_type": 2, "input_size": buf.len() });
             client.invoke_service("events-service", "create_event", kvs).await?;
+            let kvs = json!({ "key": "0.0.0.0", "value": Utc::now().timestamp_millis() });
+            client.save_state("statestore", kvs).await?;
 
 
             Ok(Response::new(Body::from(format!("{} is detected with {}/255 confidence", class_name, max_value))))

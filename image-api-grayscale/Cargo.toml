@@ -6,6 +6,7 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0"
+chrono = "0.4"
 hyper_wasi = { version = "0.15", features = ["full"]}
 tokio_wasi = { version = "1.21", features = ["rt", "macros", "net", "time", "io-util"]}
 base64 = "0.13.0"

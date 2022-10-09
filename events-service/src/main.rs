@@ -41,7 +41,7 @@ async fn handle_request(req: Request<Body>, pool: Pool) -> Result<Response<Body>
             let mut conn = pool.get_conn().await.unwrap();
 
             "DROP TABLE IF EXISTS image_evts;".ignore(&mut conn).await?;
-            "CREATE TABLE image_evts (event_ts DATETIME, op_type INT, input_size INT);".ignore(&mut conn).await?;
+            "CREATE TABLE image_evts (event_ts DATETIME DEFAULT CURRENT_TIMESTAMP, op_type INT, input_size INT);".ignore(&mut conn).await?;
 
             drop(conn);
             Ok(Response::new(Body::from("{\"status\":true}")))
