@@ -56,7 +56,7 @@ jobs:
     - name: Start dapr sentry service
       run: |
         mkdir -p .dapr/certs
-        sentry --issuer-credentials .dapr/certs --trust-domain cluster.local
+        # sentry --issuer-credentials .dapr/certs --trust-domain cluster.local
     
     - name: Run grayscale
       run: |
@@ -84,12 +84,12 @@ jobs:
       run: |
         cat events-service/server.log
         cd docs
-        curl http://localhost:9007/init || true
-        curl http://localhost:9007/events || true
+        curl http://localhost:9007/init
+        curl http://localhost:9007/events
         curl -o /dev/null http://localhost:9005/grayscale -X POST --data-binary '@food.jpg' || true
         sleep 10
         curl http://localhost:9006/classify -X POST --data-binary '@food.jpg' || true
-        curl http://localhost:9007/events || true
+        curl http://localhost:9007/events
 
     - name: Dump the grayscale server log
       run: |
