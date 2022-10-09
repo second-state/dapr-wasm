@@ -79,6 +79,7 @@ jobs:
       run: |
         cat events-service/server.log
         cd docs
+        curl http://localhost:9007/init2 || true
         curl http://localhost:9007/init || true
         curl -o /dev/null http://localhost:9005/grayscale -X POST --data-binary '@food.jpg' || true
         curl http://localhost:9006/classify -X POST --data-binary '@food.jpg' || true

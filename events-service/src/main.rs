@@ -38,13 +38,21 @@ async fn handle_request(req: Request<Body>, pool: Pool) -> Result<Response<Body>
             "The valid endpoints are /init /create_event /events",
         ))),
 
+        (&Method::GET, "/init2") => {
+            let mut conn = pool.get_conn().await.unwrap();
+            "DROP TABLE IF EXISTS orders;".ignore(&mut conn).await?;
+            "CREATE TABLE orders (order_id INT, product_id INT, quantity INT, amount FLOAT, shipping FLOAT, tax FLOAT, shipping_address VARCHAR(20));".ignore(&mut conn).await?;
+            drop(conn);
+            Ok(Response::new(Body::from("{\"status\":true}")))
+        }
+
         (&Method::GET, "/init") => {
             println!("/init");
             let mut conn = pool.get_conn().await.unwrap();
             println!("GET conn");
             "DROP TABLE IF EXISTS image_evts;".ignore(&mut conn).await?;
             println!("DROPPED table");
-            "CREATE TABLE image_evts (event_id INT NOT NULL AUTO_INCREMENT, event_ts DATETIME, op_type INT, input_size INT);".ignore(&mut conn).await?;
+            "CREATE TABLE image_evts (event_id INT NOT NULL AUTO_INCREMENT, event_ts VARCHAR(20), op_type INT, input_size INT);".ignore(&mut conn).await?;
             println!("CREATED table");
             drop(conn);
             println!("Dropped conn");
@@ -57,8 +65,9 @@ async fn handle_request(req: Request<Body>, pool: Pool) -> Result<Response<Body>
             let byte_stream = hyper::body::to_bytes(req).await?;
             let event: Event = serde_json::from_slice(&byte_stream).unwrap();
 
-            "INSERT INTO image_evts (op_type, input_size) VALUES (:op_type, :input_size)"
+            "INSERT INTO image_evts (event_ts, op_type, input_size) VALUES (:event_ts, :op_type, :input_size)"
                 .with(params! {
+                    "event_ts" => "2022-10-09 12:26:30",
                     "op_type" => event.op_type,
                     "input_size" => event.input_size,
                 })
