@@ -52,7 +52,7 @@ async fn handle_request(req: Request<Body>, pool: Pool) -> Result<Response<Body>
             println!("GET conn");
             "DROP TABLE IF EXISTS image_evts;".ignore(&mut conn).await?;
             println!("DROPPED table");
-            "CREATE TABLE image_evts (event_id INT NOT NULL AUTO_INCREMENT, event_ts VARCHAR(20), op_type INT, input_size INT);".ignore(&mut conn).await?;
+            "CREATE TABLE image_evts (event_id INT AUTO_INCREMENT, event_ts VARCHAR(20), op_type INT, input_size INT);".ignore(&mut conn).await?;
             println!("CREATED table");
             drop(conn);
             println!("Dropped conn");
