@@ -11,7 +11,7 @@ use tokio::time::{sleep, Duration};
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Event {
-    id: i32,
+    id: Option<i32>,
     // event_ts: Option<String>,
     op_type: i32, // 1: grayscale; 2: classify
     input_size: i32,
@@ -19,7 +19,7 @@ struct Event {
 
 impl Event {
     fn new(
-        id: i32,
+        id: Option<i32>,
         // event_ts: Option<String>,
         op_type: i32,
         input_size: i32,
