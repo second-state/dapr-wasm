@@ -100,7 +100,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let mysql_cred = client.get_secret("local-store", "MYSQL:CRED").await?;
     let mysql_conn = client.get_secret("local-store", "MYSQL:CONN").await?;
     println!("MYSQL value is {} {}", mysql_cred, mysql_conn);
-    let db_url = "mysql://".to_string() + &mysql_cred["MYSQL:CRED"].to_string() + "@" + &mysql_conn["MYSQL:CONN"].to_string();
+    let db_url = "mysql://".to_string() + &mysql_cred["MYSQL:CRED"].as_str().unwrap() + "@" + &mysql_conn["MYSQL:CONN"].as_str().unwrap();
     println!("Connection is {}", db_url);
 
     let opts = Opts::from_url(&db_url).unwrap();
