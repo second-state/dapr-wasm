@@ -44,7 +44,7 @@ async fn handle_request(req: Request<Body>, pool: Pool) -> Result<Response<Body>
             let mut conn = pool.get_conn().await.unwrap();
 
             "DROP TABLE IF EXISTS image_evts;".ignore(&mut conn).await?;
-            "CREATE TABLE image_evts (id INT PRIMARY KEY AUTOINCREMENT, event_ts DATETIME DEFAULT CURRENT_TIMESTAMP, op_type INT, input_size INT);".ignore(&mut conn).await?;
+            "CREATE TABLE image_evts (id INT PRIMARY KEY AUTO_INCREMENT, event_ts DATETIME DEFAULT CURRENT_TIMESTAMP, op_type INT, input_size INT);".ignore(&mut conn).await?;
 
             drop(conn);
             Ok(Response::new(Body::from("{\"status\":true}")))
@@ -79,7 +79,7 @@ async fn handle_request(req: Request<Body>, pool: Pool) -> Result<Response<Body>
             println!("/events");
             let mut conn = pool.get_conn().await.unwrap();
 
-            let events = "SELECT * FROM image_evts"
+            let events = "SELECT id, op_type, input_size FROM image_evts"
                 .with(())
                 .map(&mut conn, |(id, op_type, input_size)| {
                     Event::new(
