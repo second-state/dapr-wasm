@@ -19,7 +19,10 @@ async fn classify(req: Request<Body>) -> Result<Response<Body>, anyhow::Error> {
         ))),
 
         (&Method::POST, "/classify") => {
-            // let referer = req.headers().get("Referer").unwrap().to_str().unwrap();
+            let headers = req.headers().to_owned();
+            let referer = headers.get("Referer").unwrap().to_str().unwrap();
+            println!("IP is {}", referer);
+
             let buf = hyper::body::to_bytes(req.into_body()).await?;
             let flat_img = wasmedge_tensorflow_interface::load_jpg_image_to_rgb8(&buf, 224, 224);
 
@@ -54,8 +57,8 @@ async fn classify(req: Request<Body>) -> Result<Response<Body>, anyhow::Error> {
             client.invoke_service("events-service", "create_event", kvs).await?;
 
             let kvs = json!([{ 
-                // "key": referer, 
-                "key": "0.0.0.0", 
+                "key": referer, 
+                // "key": "0.0.0.0", 
                 "value": Utc::now().timestamp_millis()
             }]);
             println!("KVS is {}", serde_json::to_string(&kvs)?);
