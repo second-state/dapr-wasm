@@ -11,14 +11,14 @@ use tokio::time::{sleep, Duration};
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Event {
-    event_ts: String,
+    event_ts: Option<String>,
     op_type: i32, // 1: grayscale; 2: classify
     input_size: i32,
 }
 
 impl Event {
     fn new(
-        event_ts: String,
+        event_ts: Option<String>,
         op_type: i32,
         input_size: i32,
     ) -> Self {
