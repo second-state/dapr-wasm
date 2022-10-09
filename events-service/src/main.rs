@@ -11,6 +11,7 @@ use tokio::time::{sleep, Duration};
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Event {
+    id: i32,
     event_ts: Option<String>,
     op_type: i32, // 1: grayscale; 2: classify
     input_size: i32,
@@ -18,11 +19,13 @@ struct Event {
 
 impl Event {
     fn new(
+        id: i32,
         event_ts: Option<String>,
         op_type: i32,
         input_size: i32,
     ) -> Self {
         Self {
+            id: i32,
             event_ts,
             op_type,
             input_size,
@@ -41,7 +44,7 @@ async fn handle_request(req: Request<Body>, pool: Pool) -> Result<Response<Body>
             let mut conn = pool.get_conn().await.unwrap();
 
             "DROP TABLE IF EXISTS image_evts;".ignore(&mut conn).await?;
-            "CREATE TABLE image_evts (event_ts DATETIME DEFAULT CURRENT_TIMESTAMP, op_type INT, input_size INT);".ignore(&mut conn).await?;
+            "CREATE TABLE image_evts (id INT PRIMARY KEY AUTOINCREMENT, event_ts DATETIME DEFAULT CURRENT_TIMESTAMP, op_type INT, input_size INT);".ignore(&mut conn).await?;
 
             drop(conn);
             Ok(Response::new(Body::from("{\"status\":true}")))
@@ -78,8 +81,9 @@ async fn handle_request(req: Request<Body>, pool: Pool) -> Result<Response<Body>
 
             let events = "SELECT * FROM image_evts"
                 .with(())
-                .map(&mut conn, |(event_ts, op_type, input_size)| {
+                .map(&mut conn, |(id, event_ts, op_type, input_size)| {
                     Event::new(
+                        id,
                         event_ts,
                         op_type,
                         input_size,
