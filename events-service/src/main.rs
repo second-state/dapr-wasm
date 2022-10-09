@@ -39,10 +39,15 @@ async fn handle_request(req: Request<Body>, pool: Pool) -> Result<Response<Body>
         ))),
 
         (&Method::GET, "/init") => {
+            println!("/init");
             let mut conn = pool.get_conn().await.unwrap();
+            println!("GET conn");
             "DROP TABLE IF EXISTS events;".ignore(&mut conn).await?;
+            println!("DROPPED table");
             "CREATE TABLE events (id INT NOT NULL AUTO_INCREMENT, ts DATETIME, op_type INT, input_size INT);".ignore(&mut conn).await?;
+            println!("CREATED table");
             drop(conn);
+            println!("Dropped conn");
             Ok(Response::new(Body::from("{\"status\":true}")))
         }
 
