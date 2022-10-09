@@ -44,8 +44,8 @@ async fn classify(req: Request<Body>) -> Result<Response<Body>, anyhow::Error> {
             let class_name = label_lines.next().unwrap().to_string();
             println!("result: {}", class_name);
 
-            // let client = dapr::Dapr::new(3504);
-            let client = dapr::Dapr::new(3505);
+            let client = dapr::Dapr::new(3504);
+            // let client = dapr::Dapr::new(3505);
             let kvs = json!({ "op_type": 2, "input_size": buf.len() });
             client.invoke_service("events-service", "create_event", kvs).await?;
 
