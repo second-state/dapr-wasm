@@ -42,9 +42,9 @@ async fn handle_request(req: Request<Body>, pool: Pool) -> Result<Response<Body>
             println!("/init");
             let mut conn = pool.get_conn().await.unwrap();
             println!("GET conn");
-            "DROP TABLE IF EXISTS events;".ignore(&mut conn).await?;
+            "DROP TABLE IF EXISTS orders;".ignore(&mut conn).await?;
             println!("DROPPED table");
-            "CREATE TABLE events (id INT NOT NULL AUTO_INCREMENT, ts DATETIME, op_type INT, input_size INT);".ignore(&mut conn).await?;
+            "CREATE TABLE orders (id INT NOT NULL AUTO_INCREMENT, ts DATETIME, op_type INT, input_size INT);".ignore(&mut conn).await?;
             println!("CREATED table");
             drop(conn);
             println!("Dropped conn");
