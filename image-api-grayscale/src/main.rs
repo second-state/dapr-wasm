@@ -39,7 +39,8 @@ async fn grayscale(req: Request<Body>) -> Result<Response<Body>, anyhow::Error> 
                 .body(Body::from(res))
                 .unwrap();
 
-            let client = dapr::Dapr::new(3503);
+            // let client = dapr::Dapr::new(3503);
+            let client = dapr::Dapr::new(3505);
             let kvs = json!({ "op_type": "grayscale", "input_size": image_data.len() });
             client.invoke_service("events-service", "create-event", kvs).await?;
 
