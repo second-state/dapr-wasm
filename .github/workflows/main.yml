@@ -53,6 +53,11 @@ jobs:
         wget -q https://raw.githubusercontent.com/dapr/cli/master/install/install.sh -O - | /bin/bash
         dapr init
     
+    - name: Start dapr sentry service
+      run: |
+        mkdir -p .dapr/certs
+        sentry --issuer-credentials .dapr/certs --trust-domain cluster.local
+    
     - name: Run grayscale
       run: |
         cd image-api-grayscale
