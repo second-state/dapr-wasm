@@ -25,8 +25,6 @@ async fn classify(req: Request<Body>) -> Result<Response<Body>, anyhow::Error> {
                 ip = headers.get(REFERER).unwrap().to_str().unwrap();
             } else if headers.contains_key("REMOTE_ADDR") {
                 ip = headers.get("REMOTE_ADDR").unwrap().to_str().unwrap();
-            } else if headers.contains_key(USER_AGENT) {
-                ip = headers.get(USER_AGENT).unwrap().to_str().unwrap();
             }
             println!("IP is {}", ip);
 
@@ -59,14 +57,17 @@ async fn classify(req: Request<Body>) -> Result<Response<Body>, anyhow::Error> {
 
             // Connect to local sidecar
             let client = dapr::Dapr::new(3504);
+            let ts = Utc::now().timestamp_millis();
 
-            let kvs = json!({ "op_type": "classify", "input_size": buf.len() });
+            let kvs = json!({ 
+                "event_ts": ts, 
+                "op_type": "classify", 
+                "input_size": buf.len() 
+            });
             client.invoke_service("events-service", "create_event", kvs).await?;
 
             let kvs = json!([{ 
-                "key": ip, 
-                // "key": "0.0.0.0", 
-                "value": Utc::now().timestamp_millis()
+                "key": ip, "value": ts
             }]);
             println!("KVS is {}", serde_json::to_string(&kvs)?);
             client.save_state("statestore", kvs).await?;

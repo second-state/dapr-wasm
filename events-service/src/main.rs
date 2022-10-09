@@ -7,12 +7,11 @@ use std::net::SocketAddr;
 use std::result::Result;
 use serde::{Deserialize, Serialize};
 use tokio::time::{sleep, Duration};
-// use chrono::{DateTime, Utc};
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Event {
     id: Option<i32>,
-    // event_ts: Option<String>,
+    event_ts: i64,
     op_type: String,
     input_size: i32,
 }
@@ -20,13 +19,13 @@ struct Event {
 impl Event {
     fn new(
         id: Option<i32>,
-        // event_ts: Option<String>,
+        event_ts: i64,
         op_type: String,
         input_size: i32,
     ) -> Self {
         Self {
             id,
-            // event_ts,
+            event_ts,
             op_type,
             input_size,
         }
@@ -44,7 +43,7 @@ async fn handle_request(req: Request<Body>, pool: Pool) -> Result<Response<Body>
             let mut conn = pool.get_conn().await.unwrap();
 
             "DROP TABLE IF EXISTS image_evts;".ignore(&mut conn).await?;
-            "CREATE TABLE image_evts (id INT PRIMARY KEY AUTO_INCREMENT, event_ts DATETIME DEFAULT CURRENT_TIMESTAMP, op_type VARCHAR(20), input_size INT);".ignore(&mut conn).await?;
+            "CREATE TABLE image_evts (id INT PRIMARY KEY AUTO_INCREMENT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP, event_ts BIGINT, op_type VARCHAR(20), input_size INT);".ignore(&mut conn).await?;
 
             drop(conn);
             Ok(Response::new(Body::from("{\"status\":true}")))
@@ -57,13 +56,11 @@ async fn handle_request(req: Request<Body>, pool: Pool) -> Result<Response<Body>
 
             let byte_stream = hyper::body::to_bytes(req).await?;
             let event: Event = serde_json::from_slice(&byte_stream).unwrap();
-
-            // let now: DateTime<Utc> = Utc::now();
-            // event.event_ts = now.format("%Y-%m-%d %H:%M:%S");
             println!("Event is {}", serde_json::to_string(&event)?);
 
-            "INSERT INTO image_evts (op_type, input_size) VALUES (:op_type, :input_size)"
+            "INSERT INTO image_evts (event_ts, op_type, input_size) VALUES (:event_ts, :op_type, :input_size)"
                 .with(params! {
+                    "event_ts" => event.event_ts,
                     "op_type" => event.op_type,
                     "input_size" => event.input_size,
                 })
@@ -79,12 +76,12 @@ async fn handle_request(req: Request<Body>, pool: Pool) -> Result<Response<Body>
             println!("/events");
             let mut conn = pool.get_conn().await.unwrap();
 
-            let events = "SELECT id, op_type, input_size FROM image_evts"
+            let events = "SELECT id, event_ts, op_type, input_size FROM image_evts"
                 .with(())
-                .map(&mut conn, |(id, op_type, input_size)| {
+                .map(&mut conn, |(id, event_ts, op_type, input_size)| {
                     Event::new(
                         id,
-                        // event_ts,
+                        event_ts,
                         op_type,
                         input_size,
                     )},

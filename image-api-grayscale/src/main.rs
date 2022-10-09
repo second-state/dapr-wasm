@@ -1,5 +1,6 @@
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{Body, Method, Request, Response, StatusCode, Server};
+use hyper::header::*;
 use std::convert::Infallible;
 use std::net::SocketAddr;
 use std::result::Result;
@@ -15,6 +16,15 @@ async fn grayscale(req: Request<Body>) -> Result<Response<Body>, anyhow::Error> 
         ))),
 
         (&Method::POST, "/grayscale") => {
+            let headers = req.headers().to_owned();
+            let mut ip = "0.0.0.0";
+            if headers.contains_key(REFERER) {
+                ip = headers.get(REFERER).unwrap().to_str().unwrap();
+            } else if headers.contains_key("REMOTE_ADDR") {
+                ip = headers.get("REMOTE_ADDR").unwrap().to_str().unwrap();
+            }
+            println!("IP is {}", ip);
+
             let image_data = hyper::body::to_bytes(req.into_body()).await?;
             let detected = image::guess_format(&image_data);
             let mut buf = vec![];
@@ -42,11 +52,18 @@ async fn grayscale(req: Request<Body>) -> Result<Response<Body>, anyhow::Error> 
 
             // Connect to the attached sidecar
             let client = dapr::Dapr::new(3503);
+            let ts = Utc::now().timestamp_millis();
 
-            let kvs = json!({ "op_type": "grayscale", "input_size": image_data.len() });
+            let kvs = json!({ 
+                "event_ts": ts, 
+                "op_type": "grayscale", 
+                "input_size": image_data.len() 
+            });
             client.invoke_service("events-service", "create_event", kvs).await?;
 
-            let kvs = json!([{ "key": "0.0.0.0", "value": Utc::now().timestamp_millis() }]);
+            let kvs = json!([{ 
+                "key": ip, "value": ts
+            }]);
             println!("KVS is {}", serde_json::to_string(&kvs)?);
             client.save_state("statestore", kvs).await?;
 
