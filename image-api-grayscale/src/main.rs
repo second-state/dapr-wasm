@@ -40,11 +40,13 @@ async fn grayscale(req: Request<Body>) -> Result<Response<Body>, anyhow::Error> 
                 .body(Body::from(res))
                 .unwrap();
 
+            // Connect to the attached sidecar
             let client = dapr::Dapr::new(3503);
-            // let client = dapr::Dapr::new(3505);
+
             let kvs = json!({ "op_type": "grayscale", "input_size": image_data.len() });
             client.invoke_service("events-service", "create_event", kvs).await?;
-            let kvs = json!({ "key": "0.0.0.0", "value": Utc::now().timestamp_millis() });
+
+            let kvs = json!([{ "key": "0.0.0.0", "value": Utc::now().timestamp_millis() }]);
             println!("KVS is {}", serde_json::to_string(&kvs)?);
             client.save_state("statestore", kvs).await?;
 
