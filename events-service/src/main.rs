@@ -10,22 +10,22 @@ use tokio::time::{sleep, Duration};
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Event {
-    id: i32,
-    ts: String,
+    event_id: i32,
+    event_ts: String,
     op_type: i32, // 1: grayscale; 2: classify
     input_size: i32,
 }
 
 impl Event {
     fn new(
-        id: i32,
-        ts: String,
+        event_id: i32,
+        event_ts: String,
         op_type: i32,
         input_size: i32,
     ) -> Self {
         Self {
-            id,
-            ts,
+            event_id,
+            event_ts,
             op_type,
             input_size,
         }
@@ -42,9 +42,9 @@ async fn handle_request(req: Request<Body>, pool: Pool) -> Result<Response<Body>
             println!("/init");
             let mut conn = pool.get_conn().await.unwrap();
             println!("GET conn");
-            "DROP TABLE IF EXISTS orders;".ignore(&mut conn).await?;
+            "DROP TABLE IF EXISTS image_evts;".ignore(&mut conn).await?;
             println!("DROPPED table");
-            "CREATE TABLE orders (id INT NOT NULL AUTO_INCREMENT, ts DATETIME, op_type INT, input_size INT);".ignore(&mut conn).await?;
+            "CREATE TABLE image_evts (event_id INT NOT NULL AUTO_INCREMENT, event_ts DATETIME, op_type INT, input_size INT);".ignore(&mut conn).await?;
             println!("CREATED table");
             drop(conn);
             println!("Dropped conn");
@@ -57,7 +57,7 @@ async fn handle_request(req: Request<Body>, pool: Pool) -> Result<Response<Body>
             let byte_stream = hyper::body::to_bytes(req).await?;
             let event: Event = serde_json::from_slice(&byte_stream).unwrap();
 
-            "INSERT INTO events (op_type, input_size) VALUES (:op_type, :input_size)"
+            "INSERT INTO image_evts (op_type, input_size) VALUES (:op_type, :input_size)"
                 .with(params! {
                     "op_type" => event.op_type,
                     "input_size" => event.input_size,
@@ -72,12 +72,12 @@ async fn handle_request(req: Request<Body>, pool: Pool) -> Result<Response<Body>
         (&Method::GET, "/events") => {
             let mut conn = pool.get_conn().await.unwrap();
 
-            let events = "SELECT * FROM events"
+            let events = "SELECT * FROM image_evts"
                 .with(())
-                .map(&mut conn, |(id, ts, op_type, input_size)| {
+                .map(&mut conn, |(event_id, event_ts, op_type, input_size)| {
                     Event::new(
-                        id,
-                        ts,
+                        event_id,
+                        event_ts,
                         op_type,
                         input_size,
                     )},
