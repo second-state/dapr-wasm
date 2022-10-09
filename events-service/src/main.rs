@@ -57,7 +57,7 @@ async fn handle_request(req: Request<Body>, pool: Pool) -> Result<Response<Body>
 
             // let now: DateTime<Utc> = Utc::now();
             // event.event_ts = now.format("%Y-%m-%d %H:%M:%S");
-            // println!("Event is {}", event);
+            println!("Event is {}", serde_json::to_string(&event)?);
 
             "INSERT INTO image_evts (op_type, input_size) VALUES (:op_type, :input_size)"
                 .with(params! {
