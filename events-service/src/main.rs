@@ -41,7 +41,7 @@ async fn handle_request(req: Request<Body>, pool: Pool) -> Result<Response<Body>
         (&Method::GET, "/init") => {
             let mut conn = pool.get_conn().await.unwrap();
             "DROP TABLE IF EXISTS events;".ignore(&mut conn).await?;
-            "CREATE TABLE events (id INT AUTO_INCREMENT, ts DATETIME, op_type INT, input_size INT);".ignore(&mut conn).await?;
+            "CREATE TABLE events (id INT NOT NULL AUTO_INCREMENT, ts DATETIME, op_type INT, input_size INT);".ignore(&mut conn).await?;
             drop(conn);
             Ok(Response::new(Body::from("{\"status\":true}")))
         }
@@ -97,10 +97,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     sleep(Duration::from_millis(1500)).await;
 
     let client = dapr::Dapr::new(3505);
-    let mysql_cred = client.get_secret("local-store", "MYSQL:CRED").await?;
-    let mysql_conn = client.get_secret("local-store", "MYSQL:CONN").await?;
-    println!("MYSQL value is {} {}", mysql_cred, mysql_conn);
-    let db_url = "mysql://".to_string() + &mysql_cred["MYSQL:CRED"].as_str().unwrap() + "@" + &mysql_conn["MYSQL:CONN"].as_str().unwrap();
+    // let mysql_cred = client.get_secret("local-store", "MYSQL:CRED").await?;
+    // let mysql_conn = client.get_secret("local-store", "MYSQL:CONN").await?;
+    // println!("MYSQL value is {} {}", mysql_cred, mysql_conn);
+    // let db_url = "mysql://".to_string() + &mysql_cred["MYSQL:CRED"].as_str().unwrap() + "@" + &mysql_conn["MYSQL:CONN"].as_str().unwrap();
+    let v = client.get_secret("local-store", "DB_URL:MYSQL").await?;
+    println!("MYSQL value is {}", v);
+    let db_url = v["DB_URL:MYSQL"].as_str().unwrap();
     println!("Connection is {}", db_url);
 
     let opts = Opts::from_url(&db_url).unwrap();
