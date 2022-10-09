@@ -13,7 +13,7 @@ use tokio::time::{sleep, Duration};
 struct Event {
     id: Option<i32>,
     // event_ts: Option<String>,
-    op_type: i32, // 1: grayscale; 2: classify
+    op_type: String,
     input_size: i32,
 }
 
@@ -21,7 +21,7 @@ impl Event {
     fn new(
         id: Option<i32>,
         // event_ts: Option<String>,
-        op_type: i32,
+        op_type: String,
         input_size: i32,
     ) -> Self {
         Self {
@@ -44,7 +44,7 @@ async fn handle_request(req: Request<Body>, pool: Pool) -> Result<Response<Body>
             let mut conn = pool.get_conn().await.unwrap();
 
             "DROP TABLE IF EXISTS image_evts;".ignore(&mut conn).await?;
-            "CREATE TABLE image_evts (id INT PRIMARY KEY AUTO_INCREMENT, event_ts DATETIME DEFAULT CURRENT_TIMESTAMP, op_type INT, input_size INT);".ignore(&mut conn).await?;
+            "CREATE TABLE image_evts (id INT PRIMARY KEY AUTO_INCREMENT, event_ts DATETIME DEFAULT CURRENT_TIMESTAMP, op_type VARCHAR(20), input_size INT);".ignore(&mut conn).await?;
 
             drop(conn);
             Ok(Response::new(Body::from("{\"status\":true}")))

@@ -1,11 +1,11 @@
+use hyper::service::{make_service_fn, service_fn};
+use hyper::{Body, Method, Request, Response, StatusCode, Server};
+use std::convert::Infallible;
 use std::net::SocketAddr;
-use hyper::server::conn::Http;
-use hyper::service::service_fn;
-use hyper::{Body, Method, Request, Response, StatusCode};
-use tokio::net::TcpListener;
+use std::result::Result;
+use chrono::prelude::*;
 use serde_json::json;
 use image::{ImageFormat, ImageOutputFormat};
-use chrono::Utc;
 
 async fn grayscale(req: Request<Body>) -> Result<Response<Body>, anyhow::Error> {
     match (req.method(), req.uri().path()) {
@@ -42,9 +42,10 @@ async fn grayscale(req: Request<Body>) -> Result<Response<Body>, anyhow::Error> 
 
             let client = dapr::Dapr::new(3503);
             // let client = dapr::Dapr::new(3505);
-            let kvs = json!({ "op_type": 1, "input_size": image_data.len() });
+            let kvs = json!({ "op_type": "grayscale", "input_size": image_data.len() });
             client.invoke_service("events-service", "create_event", kvs).await?;
             let kvs = json!({ "key": "0.0.0.0", "value": Utc::now().timestamp_millis() });
+            println!("KVS is {}", serde_json::to_string(&kvs)?);
             client.save_state("statestore", kvs).await?;
 
             Ok(response)
@@ -62,16 +63,16 @@ async fn grayscale(req: Request<Body>) -> Result<Response<Body>, anyhow::Error> 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let addr = SocketAddr::from(([0, 0, 0, 0], 9005));
-
-    let listener = TcpListener::bind(addr).await?;
-    println!("Listening on http://{}", addr);
-    loop {
-        let (stream, _) = listener.accept().await?;
-
-        tokio::task::spawn(async move {
-            if let Err(err) = Http::new().serve_connection(stream, service_fn(grayscale)).await {
-                println!("Error serving connection: {:?}", err);
-            }
-        });
+    let make_svc = make_service_fn(|_| {
+        async move {
+            Ok::<_, Infallible>(service_fn(move |req| {
+                grayscale(req)
+            }))
+        }
+    });
+    let server = Server::bind(&addr).serve(make_svc);
+    if let Err(e) = server.await {
+        eprintln!("server error: {}", e);
     }
+    Ok(())
 }

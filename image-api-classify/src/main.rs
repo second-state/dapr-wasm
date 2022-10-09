@@ -1,11 +1,11 @@
+use hyper::service::{make_service_fn, service_fn};
+use hyper::{Body, Method, Request, Response, StatusCode, Server};
+use std::convert::Infallible;
 use std::net::SocketAddr;
-use serde_json::json;
-use hyper::server::conn::Http;
-use hyper::service::service_fn;
-use hyper::{Body, Method, Request, Response, StatusCode};
-use tokio::net::TcpListener;
+use std::result::Result;
 use chrono::prelude::*;
-use hyper::header::HeaderName;
+use serde_json::json;
+// use hyper::server::conn::AddrStream;
 
 /// This is our service handler. It receives a Request, routes on its
 /// path, and returns a Future of a Response.
@@ -46,13 +46,13 @@ async fn classify(req: Request<Body>) -> Result<Response<Body>, anyhow::Error> {
             let class_name = label_lines.next().unwrap().to_string();
             println!("result: {}", class_name);
 
+            // Connect to local sidecar
             let client = dapr::Dapr::new(3504);
-            // let client = dapr::Dapr::new(3505);
-            let kvs = json!({ "op_type": 2, "input_size": buf.len() });
+            let kvs = json!({ "op_type": "classify", "input_size": buf.len() });
             client.invoke_service("events-service", "create_event", kvs).await?;
-            let kvs = json!({ "key": "0.0.0.0", "value": &Utc::now().timestamp_millis().to_string() });
+            let kvs = json!({ "key": "0.0.0.0", "value": Utc::now().timestamp_millis().to_string() });
+            println!("KVS is {}", serde_json::to_string(&kvs)?);
             client.save_state("statestore", kvs).await?;
-
 
             Ok(Response::new(Body::from(format!("{} is detected with {}/255 confidence", class_name, max_value))))
         }
@@ -69,6 +69,21 @@ async fn classify(req: Request<Body>) -> Result<Response<Body>, anyhow::Error> {
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let addr = SocketAddr::from(([0, 0, 0, 0], 9006));
+    let make_svc = make_service_fn(|_| {
+        async move {
+            Ok::<_, Infallible>(service_fn(move |req| {
+                classify(req)
+            }))
+        }
+    });
+    let server = Server::bind(&addr).serve(make_svc);
+    if let Err(e) = server.await {
+        eprintln!("server error: {}", e);
+    }
+    Ok(())
+
+    /*
+    let addr = SocketAddr::from(([0, 0, 0, 0], 9006));
 
     let listener = TcpListener::bind(addr).await?;
     println!("Listening on http://{}", addr);
@@ -81,4 +96,5 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
             }
         });
     }
+    */
 }
