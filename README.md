@@ -10,6 +10,8 @@ This is a template application to showcase how [Dapr](https://dapr.io/) and [Was
  
 This application consists of 3 microservices and a [standalone web page](docs) that enables users to interact with the microservices using a HTML+JavaScript UI. It is a very typical JAMstack setup. Each microservice is attached to a Dapr sidecar, which provides a suite of useful services commonly required by cloud-native microservices. The overall architecture is as follows.
 
+<img src="docs/dapr-wasmedge.png" alt="Microservices architecture" width="480" style="text-align: center; margin: 0 auto;"/>
+
 The Rust version of [Dapr SDK for WasmEdge](https://github.com/second-state/dapr-sdk-wasi) is used to access Dapr sidecars from the microservice apps. Specifically, the [grayscale](https://github.com/second-state/dapr-wasm/tree/main/image-api-grayscale) microservice takes an image from an HTTP POST, turns it into grayscale, and returns the result image data in the HTTP response. 
 
 * It uses Dapr to discover and invoke the [events](https://github.com/second-state/dapr-wasm/tree/main/events-service) microservice to record every successful user request. 
