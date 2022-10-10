@@ -17,7 +17,7 @@ The Rust version of [Dapr SDK for WasmEdge](https://github.com/second-state/dapr
 * It uses Dapr to discover and invoke the [events](https://github.com/second-state/dapr-wasm/tree/main/events-service) microservice to record every successful user request. 
 * It also stores each user’s IP address and last timestamp data in its Dapr sidecar’s state database. That allows the service to rate limit users if needed. 
 
-The [classify](https://github.com/second-state/dapr-wasm/tree/main/image-api-classify) microservices takes an image from an HTTP POST, runs a Tensorflow model against it to classify the object on the image, and returns the result as a text label in the HTTP response. You can learn more about AI inference in Rust and WasmEdge here. It uses its own Dapr sidecar the same way as the [grayscale](https://github.com/second-state/dapr-wasm/tree/main/image-api-grayscale) microservice. 
+The [classify](https://github.com/second-state/dapr-wasm/tree/main/image-api-classify) microservices takes an image from an HTTP POST, runs a Tensorflow model against it to classify the object on the image, and returns the result as a text label in the HTTP response. You can learn more about AI inference in Rust and WasmEdge [here](https://wasmedge.org/book/en/write_wasm/rust/wasinn.html). It uses its own Dapr sidecar the same way as the [grayscale](https://github.com/second-state/dapr-wasm/tree/main/image-api-grayscale) microservice. 
 
 The [events](https://github.com/second-state/dapr-wasm/tree/main/events-service) microservice takes JSON data from a HTTP POST and saves it to an external MySQL database for later analysis. 
 
