@@ -1,6 +1,6 @@
 # Dapr and WasmEdge
 
-[Live Demo](http://dapr-demo.secondstate.co) | [Tutorial video](https://youtu.be/t_sQP6Qpf7U)
+[Live Demo](http://dapr-demo.secondstate.co) | [Tutorial video](https://www.youtube.com/watch?v=3v37pAT9iK8)
 
 ## Introduction
 
