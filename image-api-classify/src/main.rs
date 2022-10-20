@@ -59,14 +59,14 @@ async fn classify(req: Request<Body>) -> Result<Response<Body>, anyhow::Error> {
             let client = dapr::Dapr::new(3504);
             let ts = Utc::now().timestamp_millis();
 
-            let kvs = json!({ 
-                "event_ts": ts, 
-                "op_type": "classify", 
-                "input_size": buf.len() 
+            let kvs = json!({
+                "event_ts": ts,
+                "op_type": "classify",
+                "input_size": buf.len()
             });
             client.invoke_service("events-service", "create_event", kvs).await?;
 
-            let kvs = json!([{ 
+            let kvs = json!([{
                 "key": ip, "value": ts
             }]);
             println!("KVS is {}", serde_json::to_string(&kvs)?);
@@ -99,20 +99,4 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         eprintln!("server error: {}", e);
     }
     Ok(())
-
-    /*
-    let addr = SocketAddr::from(([0, 0, 0, 0], 9006));
-
-    let listener = TcpListener::bind(addr).await?;
-    println!("Listening on http://{}", addr);
-    loop {
-        let (stream, _) = listener.accept().await?;
-
-        tokio::task::spawn(async move {
-            if let Err(err) = Http::new().serve_connection(stream, service_fn(classify)).await {
-                println!("Error serving connection: {:?}", err);
-            }
-        });
-    }
-    */
 }
