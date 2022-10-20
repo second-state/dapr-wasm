@@ -14,9 +14,12 @@ async fn classify(req: Request<Body>) -> Result<Response<Body>, anyhow::Error> {
     let labels = include_str!("models/mobilenet_v1_1.0_224/labels_mobilenet_quant_v1_224.txt");
     match (req.method(), req.uri().path()) {
         // Serve some instructions at /
-        (&Method::GET, "/") => Ok(Response::new(Body::from(
-            "Try POSTing data to /classify such as: `curl http://localhost:9006/classify -X POST --data-binary '@grace_hopper.jpg'`",
-        ))),
+        (&Method::GET, "/") => Ok(response_build(
+            &String::from("Try POSTing data to /classify such as: `curl http://localhost:9006/classify -X POST --data-binary '@grace_hopper.jpg'`")
+        )),
+
+        // CORS Options
+        (&Method::OPTIONS, "/classify") => Ok(response_build(&String::from(""))),
 
         (&Method::POST, "/classify") => {
             let headers = req.headers().to_owned();
@@ -72,7 +75,7 @@ async fn classify(req: Request<Body>) -> Result<Response<Body>, anyhow::Error> {
             println!("KVS is {}", serde_json::to_string(&kvs)?);
             client.save_state("statestore", kvs).await?;
 
-            Ok(Response::new(Body::from(format!("{} is detected with {}/255 confidence", class_name, max_value))))
+            Ok(response_build(&format!("{} is detected with {}/255 confidence", class_name, max_value)))
         }
 
         // Return the 404 Not Found for other routes.
@@ -82,6 +85,16 @@ async fn classify(req: Request<Body>) -> Result<Response<Body>, anyhow::Error> {
             Ok(not_found)
         }
     }
+}
+
+// CORS headers
+fn response_build(body: &String) -> Response<Body> {
+    Response::builder()
+        .header("Access-Control-Allow-Origin", "*")
+        .header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        .header("Access-Control-Allow-Headers", "api,Keep-Alive,User-Agent,Content-Type")
+        .body(Body::from(body.to_string()))
+        .unwrap()
 }
 
 #[tokio::main(flavor = "current_thread")]
