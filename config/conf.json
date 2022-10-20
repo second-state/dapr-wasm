@@ -1,4 +1,0 @@
-{    
-    "WASM_BINARY" : "./lib/classify_bg.wasm",
-    "WASM_BINARY_SO" : "./lib/classify.so"
-}

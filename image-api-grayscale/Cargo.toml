@@ -5,8 +5,12 @@ authors = ["yukang <moorekang@gmail.com>", "Michael Yuan <michael@secondstate.io
 edition = "2021"
 
 [dependencies]
+anyhow = "1.0"
+chrono = "0.4"
 hyper_wasi = { version = "0.15", features = ["full"]}
 tokio_wasi = { version = "1.21", features = ["rt", "macros", "net", "time", "io-util"]}
 base64 = "0.13.0"
 image = { version = "0.23.0", default-features = false, features = ["jpeg", "png", "gif"] }
 imageproc = "0.21.0"
+serde_json = "1.0"
+dapr_sdk_wasi = { git = "https://github.com/second-state/dapr-sdk-wasi" }
