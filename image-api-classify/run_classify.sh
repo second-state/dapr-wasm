@@ -9,4 +9,4 @@ dapr run --app-id image-api-classify \
         --dapr-http-port 3504 \
         --log-level debug \
         --components-path ../config \
-        wasmedge-tensorflow-lite wasmedge_hyper_server_tflite.wasm
+        wasmedge wasmedge_hyper_server_tflite.wasm

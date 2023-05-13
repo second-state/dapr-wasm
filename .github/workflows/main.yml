@@ -76,7 +76,7 @@ jobs:
         cd image-api-classify
         cargo build --target wasm32-wasi --release
         wasmedgec target/wasm32-wasi/release/wasmedge_hyper_server_tflite.wasm wasmedge_hyper_server_tflite.wasm
-        nohup dapr run --app-id image-api-classify --app-protocol http --app-port 9006 --dapr-http-port 3504 --components-path ../config --log-level debug wasmedge-tensorflow-lite wasmedge_hyper_server_tflite.wasm > server.log 2>&1 &
+        nohup dapr run --app-id image-api-classify --app-protocol http --app-port 9006 --dapr-http-port 3504 --components-path ../config --log-level debug wasmedge wasmedge_hyper_server_tflite.wasm > server.log 2>&1 &
 
     - name: Run events service
       run: |
