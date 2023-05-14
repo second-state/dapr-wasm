@@ -5,7 +5,6 @@ use std::convert::Infallible;
 use std::net::SocketAddr;
 use std::result::Result;
 use std::io::Cursor;
-use std::fs;
 use image::io::Reader;
 use image::DynamicImage;
 use std::convert::TryInto;
@@ -16,16 +15,17 @@ use wasi_nn;
 /// This is our service handler. It receives a Request, routes on its
 /// path, and returns a Future of a Response.
 async fn classify(req: Request<Body>) -> Result<Response<Body>, anyhow::Error> {
+    let model_data: &[u8] = include_bytes!("models/mobilenet_v1_1.0_224/mobilenet_v1_1.0_224_quant.tflite");
+    let labels = include_str!("models/mobilenet_v1_1.0_224/labels_mobilenet_quant_v1_224.txt");
     let graph = unsafe {
         wasi_nn::load(
-            &[&fs::read("models/mobilenet_v1_1.0_224/mobilenet_v1_1.0_224_quant.tflite").unwrap()],
+            &[model_data],
             4, // encoding for tflite: wasi_nn::GRAPH_ENCODING_TENSORFLOWLITE
             wasi_nn::EXECUTION_TARGET_CPU,
         )
         .unwrap()
     };
     let context = unsafe { wasi_nn::init_execution_context(graph).unwrap() };
-    let labels = include_str!("models/mobilenet_v1_1.0_224/labels_mobilenet_quant_v1_224.txt");
 
     match (req.method(), req.uri().path()) {
         // Serve some instructions at /
@@ -72,7 +72,7 @@ async fn classify(req: Request<Body>) -> Result<Response<Body>, anyhow::Error> {
             let results = sort_results(&output_buffer);
             // The first result's first element points to the labels position
             let class_name = labels.lines().nth(results[0].0).unwrap_or("Unknown");
-            println!("result: {}", class_name);
+            println!("result: {} {} {}", class_name, results[0].0, results[0].1);
 
             // Connect to local sidecar
             let client = dapr::Dapr::new(3504);

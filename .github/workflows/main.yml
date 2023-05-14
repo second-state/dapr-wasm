@@ -45,8 +45,12 @@ jobs:
         
     - name: Install WasmEdge
       run: |
-        VERSION=0.11.1
-        curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | sudo bash -s -- -e all --version=$VERSION --tf-version=$VERSION --tf-deps-version=$VERSION --tf-tools-version=$VERSION -p /usr/local
+        VERSION=0.12.1
+        curl -s -L -O --remote-name-all https://github.com/second-state/WasmEdge-tensorflow-deps/releases/download/$VERSION/WasmEdge-tensorflow-deps-TFLite-$VERSION-manylinux2014_x86_64.tar.gz
+        tar -zxf WasmEdge-tensorflow-deps-TFLite-$VERSION-manylinux2014_x86_64.tar.gz
+        rm -f WasmEdge-tensorflow-deps-TFLite-$VERSION-manylinux2014_x86_64.tar.gz
+        sudo mv libtensorflowlite_c.so /usr/local/lib
+        curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | sudo bash -s -- -v $VERSION --plugins wasi_nn-tensorflowlite -p /usr/local
         
     - name: Install and init dapr
       run: |
@@ -72,7 +76,7 @@ jobs:
         cd image-api-classify
         cargo build --target wasm32-wasi --release
         wasmedgec target/wasm32-wasi/release/wasmedge_hyper_server_tflite.wasm wasmedge_hyper_server_tflite.wasm
-        nohup dapr run --app-id image-api-classify --app-protocol http --app-port 9006 --dapr-http-port 3504 --components-path ../config --log-level debug wasmedge-tensorflow-lite wasmedge_hyper_server_tflite.wasm > server.log 2>&1 &
+        nohup dapr run --app-id image-api-classify --app-protocol http --app-port 9006 --dapr-http-port 3504 --components-path ../config --log-level debug wasmedge wasmedge_hyper_server_tflite.wasm > server.log 2>&1 &
 
     - name: Run events service
       run: |
