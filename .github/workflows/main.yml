@@ -46,11 +46,14 @@ jobs:
     - name: Install WasmEdge
       run: |
         VERSION=0.13.1
-        curl -s -L -O --remote-name-all https://github.com/second-state/WasmEdge-tensorflow-deps/releases/download/$VERSION/WasmEdge-tensorflow-deps-TFLite-$VERSION-manylinux2014_x86_64.tar.gz
-        tar -zxf WasmEdge-tensorflow-deps-TFLite-$VERSION-manylinux2014_x86_64.tar.gz
-        rm -f WasmEdge-tensorflow-deps-TFLite-$VERSION-manylinux2014_x86_64.tar.gz
+        TFVERSION=2.12.0
+        curl -s -L -O --remote-name-all https://github.com/second-state/WasmEdge-tensorflow-deps/releases/download/TF-2.12.0-CC/WasmEdge-tensorflow-deps-TFLite-TF-$TFVERSION-CC-manylinux2014_x86_64.tar.gz
+        tar -zxf WasmEdge-tensorflow-deps-TFLite-TF-$TFVERSION-CC-manylinux2014_x86_64.tar.gz
+        rm -f WasmEdge-tensorflow-deps-TFLite-TF-$TFVERSION-CC-manylinux2014_x86_64.tar.gz
         sudo mv libtensorflowlite_c.so /usr/local/lib
+        sudo mv libtensorflowlite_flex.so /usr/local/lib
         curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | sudo bash -s -- -v $VERSION --plugins wasi_nn-tensorflowlite -p /usr/local
+        
         
     - name: Install and init dapr
       run: |

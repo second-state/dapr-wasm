@@ -1,6 +1,6 @@
 # Dapr and WasmEdge
 
-[Live Demo](http://dapr-demo.secondstate.co) | [Tutorial video](https://www.youtube.com/watch?v=3v37pAT9iK8)
+[Tutorial video](https://www.youtube.com/watch?v=3v37pAT9iK8)
 
 ## Introduction
 
@@ -28,10 +28,10 @@ Now, go ahead and fork this repo. Create and deploy your own lightweight microse
 
 ## Build and deploy these microservices in Dapr
 
-You will need install the following software toolchain to run these examples.
+You will need install the following software toolchain to run these examples. The detailed steps are shown in the [GitHub Actions script](.github/workflows/main.yml).
 
 * [Install the Dapr CLI](https://docs.dapr.io/getting-started/install-dapr-cli/)
-* [Install the WasmEdge Runtime](https://wasmedge.org/book/en/quick_start/install.html)
+* [Install the WasmEdge Runtime](https://wasmedge.org/docs/develop/build-and-run/install)
 * [Install Rust](https://www.rust-lang.org/tools/install)
 * Install the [MySQL](https://dev.mysql.com/doc/mysql-installation-excerpt/5.7/en/) or [MariaDB](https://mariadb.com/kb/en/getting-installing-and-upgrading-mariadb/) or [TiDB](https://docs.pingcap.com/tidb/dev/quick-start-with-tidb) databases
 
@@ -48,7 +48,7 @@ Build.
 ```bash
 cd image-api-grayscale
 cargo build --target wasm32-wasi --release
-wasmedgec ./target/wasm32-wasi/release/image-api-grayscale.wasm image-api-grayscale.wasm
+wasmedge compile ./target/wasm32-wasi/release/image-api-grayscale.wasm image-api-grayscale.wasm
 ```
 
 Deploy.
@@ -70,7 +70,7 @@ Build.
 ```bash
 cd image-api-classify
 cargo build --target wasm32-wasi --release
-wasmedgec target/wasm32-wasi/release/wasmedge_hyper_server_tflite.wasm wasmedge_hyper_server_tflite.wasm
+wasmedge compile target/wasm32-wasi/release/wasmedge_hyper_server_tflite.wasm wasmedge_hyper_server_tflite.wasm
 ```
 
 Deploy.
@@ -82,7 +82,7 @@ dapr run --app-id image-api-classify \
         --dapr-http-port 3504 \
         --log-level debug \
         --components-path ../config \
-        wasmedge-tensorflow-lite wasmedge_hyper_server_tflite.wasm
+        wasmedge wasmedge_hyper_server_tflite.wasm
 ```
 
 ### The events recorder microservice
@@ -92,7 +92,7 @@ Build.
 ```bash
 cd events-service
 cargo build --target wasm32-wasi --release
-wasmedgec target/wasm32-wasi/release/events_service.wasm events_service.wasm
+wasmedge compile target/wasm32-wasi/release/events_service.wasm events_service.wasm
 ```
 
 Deploy.
