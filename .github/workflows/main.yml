@@ -72,21 +72,21 @@ jobs:
         cd image-api-grayscale
         cargo build --target wasm32-wasi --release
         wasmedgec target/wasm32-wasi/release/image-api-grayscale.wasm image-api-grayscale.wasm
-        nohup dapr run --app-id image-api-grayscale --app-protocol http --app-port 9005 --dapr-http-port 3503 --components-path ../config --log-level debug wasmedge image-api-grayscale.wasm > server.log 2>&1 &
+        nohup dapr run --app-id image-api-grayscale --app-protocol http --app-port 9005 --dapr-http-port 3503 --resources-path ../config --log-level debug wasmedge image-api-grayscale.wasm > server.log 2>&1 &
 
     - name: Run classify
       run: |
         cd image-api-classify
         cargo build --target wasm32-wasi --release
         wasmedgec target/wasm32-wasi/release/wasmedge_hyper_server_tflite.wasm wasmedge_hyper_server_tflite.wasm
-        nohup dapr run --app-id image-api-classify --app-protocol http --app-port 9006 --dapr-http-port 3504 --components-path ../config --log-level debug wasmedge wasmedge_hyper_server_tflite.wasm > server.log 2>&1 &
+        nohup dapr run --app-id image-api-classify --app-protocol http --app-port 9006 --dapr-http-port 3504 --resources-path ../config --log-level debug wasmedge wasmedge_hyper_server_tflite.wasm > server.log 2>&1 &
 
     - name: Run events service
       run: |
         cd events-service
         cargo build --target wasm32-wasi --release
         wasmedgec target/wasm32-wasi/release/events_service.wasm events_service.wasm
-        nohup dapr run --app-id events-service --app-protocol http --app-port 9007 --dapr-http-port 3505 --components-path ../config --log-level debug wasmedge events_service.wasm > server.log 2>&1 &
+        nohup dapr run --app-id events-service --app-protocol http --app-port 9007 --dapr-http-port 3505 --resources-path ../config --log-level debug wasmedge events_service.wasm > server.log 2>&1 &
         sleep 10
 
     - name: Run tests
