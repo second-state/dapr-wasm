@@ -53,7 +53,7 @@ jobs:
         rm -f WasmEdge-tensorflow-deps-TFLite-TF-$TFVERSION-CC-manylinux2014_x86_64.tar.gz
         sudo mv libtensorflowlite_c.so /usr/local/lib
         sudo mv libtensorflowlite_flex.so /usr/local/lib
-        curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | sudo bash -s -- -v $VERSION --plugins wasi_nn-tensorflowlite -p /usr/local
+        curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | sudo bash -s -- -v $VERSION --plugins wasi_nn-tensorflowlite wasmedge_rustls -p /usr/local
         
         
     - name: Install and init dapr
